@@ -24,6 +24,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import HistoryIcon from '@mui/icons-material/History'
 import BarChartIcon from '@mui/icons-material/BarChart'
+import SpeedIcon from '@mui/icons-material/Speed'
 import AccountTreeIcon from '@mui/icons-material/AccountTree'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
 import Brightness7Icon from '@mui/icons-material/Brightness7'
@@ -36,6 +37,7 @@ import DataGeneratorView from './views/DataGeneratorView'
 import ConversionRunnerView from './views/ConversionRunnerView'
 import ConversionHistoryView from './views/ConversionHistoryView'
 import ConversionChartsView from './views/ConversionChartsView'
+import BenchmarkDashboardView from './views/BenchmarkDashboardView'
 import DiagramsView from './views/DiagramsView'
 
 const DRAWER_WIDTH = 230
@@ -46,6 +48,7 @@ const NAV_ITEMS = [
   { label: 'Conversion Runner', path: '/convert', icon: <PlayArrowIcon /> },
   { label: 'History', path: '/history', icon: <HistoryIcon /> },
   { label: 'Charts', path: '/charts', icon: <BarChartIcon /> },
+  { label: 'Benchmark', path: '/benchmark', icon: <SpeedIcon /> },
   { label: 'Diagrams', path: '/diagrams', icon: <AccountTreeIcon /> },
 ]
 
@@ -149,6 +152,7 @@ function AppShell({
             <Route path="/convert" element={<ConversionRunnerView />} />
             <Route path="/history" element={<ConversionHistoryView />} />
             <Route path="/charts" element={<ConversionChartsView />} />
+            <Route path="/benchmark" element={<BenchmarkDashboardView />} />
             <Route path="/diagrams" element={<DiagramsView />} />
           </Routes>
         </Box>
