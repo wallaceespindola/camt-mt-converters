@@ -1,0 +1,60 @@
+@startuml architecture-overview
+!theme plain
+
+skinparam componentStyle rectangle
+skinparam backgroundColor #FAFAFA
+skinparam component {
+  BackgroundColor #FFF3E0
+  BorderColor #E64A19
+}
+
+package "React SPA (MUI + Recharts)" as Frontend {
+  [Dashboard / Generate / Runner / History / Charts / Diagrams] as UI
+}
+
+package "REST API Layer" as API {
+  [RandomStatementController\nPOST /api/random-statements] as RS
+  [StatementConversionController\nPOST /api/conversions\nGET /api/conversions/jobs] as CV
+  [Spring Actuator\n/actuator/health /actuator/info] as ACT
+}
+
+package "Spring Batch Pipeline" as Batch {
+  [JobLauncher] as JL
+  [statementExportJob] as JOB
+  [statementExportStep (chunk-size=1)] as STEP
+  [BankStatementItemReader] as READER
+  [StatementExportProcessor] as PROC
+  [BankingFileWriter] as WRITER
+}
+
+package "Strategy Pattern x 8" as Strategy {
+  [StatementExportStrategyFactory] as SF
+  [4 Prowide Strategies\n(MT940, MT942, camt.052, camt.053)] as P4
+  [4 Velocity Strategies\n(MT940, MT942, camt.052, camt.053)] as V4
+}
+
+database "H2 In-Memory" as DB {
+  [bank_statements] as BS
+  [bank_transactions] as BT
+}
+
+folder "output/" as OUTPUT {
+  [*.mt940 *.mt942\n*.camt052.xml *.camt053.xml] as FILES
+}
+
+UI --> RS
+UI --> CV
+RS --> DB
+CV --> JL
+JL --> JOB
+JOB --> STEP
+STEP --> READER
+READER --> DB
+STEP --> PROC
+PROC --> SF
+SF --> P4
+SF --> V4
+STEP --> WRITER
+WRITER --> OUTPUT
+
+@enduml

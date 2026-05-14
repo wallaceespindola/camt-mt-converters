@@ -1,0 +1,38 @@
+@startuml database-diagram
+!theme plain
+
+skinparam backgroundColor #FAFAFA
+skinparam entity {
+  BackgroundColor #FFF3E0
+  BorderColor #E64A19
+}
+
+entity "bank_statements" as BS {
+  * id : BIGINT <<PK>>
+  --
+  statement_reference : VARCHAR
+  account_iban : VARCHAR
+  account_currency : VARCHAR
+  statement_date : DATE
+  opening_balance : DECIMAL
+  closing_balance : DECIMAL
+}
+
+entity "bank_transactions" as BT {
+  * id : BIGINT <<PK>>
+  --
+  * statement_id : BIGINT <<FK>>
+  booking_date : DATE
+  value_date : DATE
+  amount : DECIMAL
+  currency : VARCHAR
+  debit_credit_indicator : VARCHAR
+  transaction_reference : VARCHAR
+  counterparty_name : VARCHAR
+  remittance_information : VARCHAR
+  bank_transaction_code : VARCHAR
+}
+
+BS ||--o{ BT : "contains"
+
+@enduml

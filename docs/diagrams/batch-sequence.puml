@@ -1,0 +1,54 @@
+@startuml batch-sequence
+!theme plain
+
+skinparam backgroundColor #FAFAFA
+skinparam sequence {
+  ArrowColor #E64A19
+  ActorBorderColor #E64A19
+  LifeLineBorderColor #BDBDBD
+  ParticipantBackgroundColor #FFF3E0
+  ParticipantBorderColor #E64A19
+}
+
+participant "React Frontend" as FE
+participant "RandomStatementController" as RS
+participant "RandomStatementService" as SVC
+participant "StatementConversionController" as CV
+participant "BatchJobService" as BJS
+participant "BankStatementItemReader" as IR
+participant "StatementExportProcessor" as IP
+participant "StatementExportStrategyFactory" as SF
+participant "StatementExportStrategy" as ST
+participant "BankingFileWriter" as IW
+database "H2 Database" as DB
+collections "output/" as FS
+
+note over FE,DB: Step 1 — Generate random banking statement data
+
+FE -> RS: POST /api/random-statements?loadProfile=LOW
+RS -> SVC: generate(LOW)
+SVC -> DB: save BankStatementEntity + BankTransactionEntities
+SVC --> RS: GenerationResult
+RS --> FE: {firstStatementId, statementsGenerated, transactionsGenerated}
+
+note over FE,FS: Step 2 — Launch Spring Batch conversion job
+
+FE -> CV: POST /api/conversions\n{statementId:1, targetFormat:MT940, engine:PROWIDE}
+CV -> BJS: launch(1, MT940, PROWIDE)
+BJS -> IR: @BeforeStep — load statementId from JobParameters
+IR -> DB: findByIdWithTransactions(1)
+DB --> IR: BankStatementEntity + transactions
+BJS -> IP: process(BankStatementEntity)
+IP -> IP: mapper.toDomain(entity) -> BankStatement
+IP -> IP: validator.validate(statement)
+IP -> SF: getStrategy(MT940, PROWIDE)
+SF --> IP: InternalToMt940ProwideStrategy
+IP -> ST: export(BankStatement)
+ST --> IP: GeneratedBankingFile(fileName, contentType, content)
+IP -> IW: write([GeneratedBankingFile])
+IW -> FS: write statement-1.mt940
+IW --> BJS: COMPLETED + outputFile + fileContent
+BJS --> CV: BatchJobResult
+CV --> FE: {jobId, status:COMPLETED, outputFile, fileContent}
+
+@enduml

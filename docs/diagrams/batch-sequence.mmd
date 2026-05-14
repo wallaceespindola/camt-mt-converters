@@ -1,0 +1,39 @@
+sequenceDiagram
+    participant FE as React Frontend
+    participant RS as RandomStatementController
+    participant SVC as RandomStatementService
+    participant CV as StatementConversionController
+    participant BJS as BatchJobService
+    participant IR as BankStatementItemReader
+    participant IP as StatementExportProcessor
+    participant SF as StatementExportStrategyFactory
+    participant ST as StatementExportStrategy
+    participant IW as BankingFileWriter
+    participant DB as H2 Database
+    participant FS as output/
+
+    Note over FE,DB: Step 1 — Generate random banking statement data
+    FE->>RS: POST /api/random-statements?loadProfile=LOW
+    RS->>SVC: generate(LOW)
+    SVC->>DB: save BankStatementEntity + BankTransactionEntities
+    SVC-->>RS: GenerationResult
+    RS-->>FE: {firstStatementId, statementsGenerated, transactionsGenerated}
+
+    Note over FE,FS: Step 2 — Launch Spring Batch conversion job
+    FE->>CV: POST /api/conversions {statementId:1, targetFormat:MT940, engine:PROWIDE}
+    CV->>BJS: launch(1, MT940, PROWIDE)
+    BJS->>IR: @BeforeStep — load statementId from JobParameters
+    IR->>DB: findByIdWithTransactions(1)
+    DB-->>IR: BankStatementEntity + transactions
+    BJS->>IP: process(BankStatementEntity)
+    IP->>IP: mapper.toDomain(entity) → BankStatement
+    IP->>IP: validator.validate(statement)
+    IP->>SF: getStrategy(MT940, PROWIDE)
+    SF-->>IP: InternalToMt940ProwideStrategy
+    IP->>ST: export(BankStatement)
+    ST-->>IP: GeneratedBankingFile(fileName, contentType, content)
+    IP->>IW: write([GeneratedBankingFile])
+    IW->>FS: write statement-1.mt940
+    IW-->>BJS: COMPLETED + outputFile + fileContent
+    BJS-->>CV: BatchJobResult
+    CV-->>FE: {jobId, status:COMPLETED, outputFile, fileContent}

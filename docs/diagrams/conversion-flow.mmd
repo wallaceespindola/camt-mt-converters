@@ -1,0 +1,39 @@
+flowchart LR
+    INPUT[Internal Domain Model\nBankStatement\nBankTransaction]
+
+    subgraph PROWIDE["Prowide Engine"]
+        P1[MT940 via\nProwide Core]
+        P2[MT942 via\nProwide Core]
+        P3[camt.052 via\nProwide ISO 20022]
+        P4[camt.053 via\nProwide ISO 20022]
+    end
+
+    subgraph VELOCITY["Velocity Engine"]
+        V1[MT940 via\nmt940.vm]
+        V2[MT942 via\nmt942.vm]
+        V3[camt.052 via\ncamt052.vm]
+        V4[camt.053 via\ncamt053.vm]
+    end
+
+    subgraph VALIDATE["3-Stage Validation"]
+        VA[1 Internal Model\nValidator]
+        VB[2 MT Re-parse\nvia Prowide]
+        VC[3 camt XSD\nValidation]
+    end
+
+    OUT1["statement-N.mt940\ntext/plain"]
+    OUT2["statement-N.mt942\ntext/plain"]
+    OUT3["statement-N.camt052.xml\napplication/xml"]
+    OUT4["statement-N.camt053.xml\napplication/xml"]
+
+    INPUT --> VALIDATE
+    VALIDATE --> PROWIDE
+    VALIDATE --> VELOCITY
+    P1 --> OUT1
+    P2 --> OUT2
+    P3 --> OUT3
+    P4 --> OUT4
+    V1 --> OUT1
+    V2 --> OUT2
+    V3 --> OUT3
+    V4 --> OUT4

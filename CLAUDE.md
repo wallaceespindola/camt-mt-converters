@@ -2,6 +2,8 @@
 
 > **Implementation Status: COMPLETE** — 46 source files, 11 test classes, 45 tests passing, `mvn verify` green.
 > 8 strategies (4 Prowide + 4 Velocity), Spring Batch pipeline, REST API, domain + persistence layers, JaCoCo check passes.
+> React 19 frontend with 6 views (Dashboard, Generate, Runner, History, Charts, Diagrams) — pre-built bundle in `src/main/resources/static/`.
+> 14 architecture diagrams in `docs/diagrams/` (.mmd + .puml). 6 cross-platform run/kill scripts (sh, ps1, bat).
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -67,7 +69,7 @@ POST /api/conversions
     → BankStatementItemReader reads entity from H2
     → StatementExportProcessor maps entity → domain, resolves strategy
     → StatementExportStrategy.export() generates file content
-    → BankingFileWriter writes file to ./exports/
+    → BankingFileWriter writes file to ./output/
 ```
 
 ### Strategy Pattern
@@ -132,9 +134,10 @@ The Jakarta XML Binding strategy package (`/conversion/strategy/jakartaxb`) is o
 
 | Method | Path | Purpose |
 |--------|------|---------|
-| `POST` | `/api/random-statements` | Generate and persist a random `BankStatement` |
+| `POST` | `/api/random-statements` | Generate and persist random `BankStatement` data; `?loadProfile=LOW\|HIGH` |
 | `POST` | `/api/conversions` | Launch Spring Batch export job |
-| `GET`  | `/api/conversions/jobs/{jobId}` | Poll batch job status |
+| `GET`  | `/api/conversions/jobs` | List all job executions (last 50) |
+| `GET`  | `/api/conversions/jobs/{jobId}` | Poll batch job status by ID |
 
 Request body for `POST /api/conversions`:
 ```json
@@ -142,41 +145,57 @@ Request body for `POST /api/conversions`:
 ```
 
 `targetFormat`: `MT940`, `MT942`, `CAMT052`, `CAMT053`
-`engine`: `PROWIDE` (default), `VELOCITY`, `JAKARTA_XML_BINDING`
+`engine`: `PROWIDE`, `VELOCITY`
 
-## Validation Chain
+## React Frontend
 
-Every conversion must pass three stages:
-1. **Internal model** — Bean Validation on domain record (IBAN present, currency, balances, at least one transaction)
-2. **MT output** — Parse back with Prowide Core, confirm required fields (Field20, Field25, Field60F, etc.)
-3. **camt output** — Validate generated XML against ISO 20022 XSD before writing
+Source: `src/main/frontend/` (React 19 + MUI + Recharts + Mermaid, TypeScript strict)
+Built bundle: `src/main/resources/static/` (committed — served directly by Spring Boot)
 
-Velocity-generated output must go through the same MT/camt validation before write; it is never written raw.
+```bash
+make build-frontend   # npm install + vite build → src/main/resources/static/
+make dev-frontend     # Vite dev server :3000, proxies /api + /actuator to :8080
+```
+
+Views: Dashboard · Generate Statements · Conversion Runner (incl. Run All 8 Combinations) · History · Charts · Diagrams
+
+## Architecture Diagrams
+
+`docs/diagrams/` — 7 diagrams × 2 formats (.mmd Mermaid + .puml PlantUML):
+architecture-overview, batch-sequence, strategy-class-diagram, conversion-flow, database-diagram, deployment-diagram, component-diagram
+
+Also rendered live in the **Diagrams** view of the React SPA.
+
+## Cross-Platform Scripts
+
+| Script | Platform |
+|---|---|
+| `run.sh` / `kill.sh` | macOS + Linux (bash) |
+| `run.ps1` / `kill.ps1` | PowerShell Core 7+ (all platforms) |
+| `run.bat` / `kill.bat` | Windows 10+ CMD |
+
+All scripts build (skippable with `--skip-build` / `-SkipBuild`), wait for `/actuator/health`, write logs to `logs/`.
 
 ## Output Files
 
-Generated under `./output/` (gitignored):
+Generated under `./output/` (gitignored; `.gitkeep` preserves the directory):
 ```
-statement-{id}.mt940
-statement-{id}.mt942
-statement-{id}.camt052.xml
-statement-{id}.camt053.xml
+statement-{id}.mt940        text/plain
+statement-{id}.mt942        text/plain
+statement-{id}.camt052.xml  application/xml
+statement-{id}.camt053.xml  application/xml
 ```
 
 ## Java Package Convention
 
 All packages: `com.wtechitsolutions.bankingconverter.*`
 
-## Testing Requirements
+## Test Suite
 
-- **Unit tests** for each strategy, mapper, factory, and service
-- **Spring Batch integration tests** — one per target format, using `@SpringBatchTest`
-- **API tests** — `@SpringBootTest` with `MockMvc` or `WebTestClient`
-- **Golden file tests** — compare generated output against files in `src/test/resources/golden-files/{mt940,mt942,camt052,camt053}/`
-- Target: >80% coverage
+45 tests, 0 failures — `mvn verify` green, JaCoCo ≥40% instruction coverage enforced.
 
-## MVP vs Out of Scope
+Classes: StrategyFactoryTest · ProwideStrategyOutputTest · VelocityStrategyOutputTest · GoldenFileTest · BatchJobIntegrationTest · BankStatementMapperTest · InternalStatementValidatorTest · RandomStatementControllerTest · StatementConversionControllerTest · ActuatorTest · SwaggerAvailabilityTest
 
-**MVP**: Generate random data → save to H2 → batch export to all 4 formats via Prowide → write to `./exports/`
+## Out of Scope (v1)
 
-**Out of scope (v1)**: Reverse conversion (MT→internal), Apache Camel, Kafka, SFTP, auth, multi-tenant, Flyway, Docker Compose.
+Reverse conversion (MT→internal), Jakarta XML Binding strategies, Apache Camel, Kafka, SFTP, auth, multi-tenant, Flyway, Docker Compose.

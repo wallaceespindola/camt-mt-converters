@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := help
 SKIP_TESTS := -DskipTests
 
-.PHONY: help build run run-prod test test-unit test-integration clean kill lint docs run-script kill-script
+.PHONY: help build run run-prod test test-unit test-integration clean kill lint docs run-script kill-script build-frontend dev-frontend
 
 help: ## Display all available make commands with descriptions
 	@echo ""
@@ -51,3 +51,9 @@ run-script: ## Build and start via run.sh (macOS/Linux) — foreground with heal
 
 kill-script: ## Stop the backend via kill.sh (macOS/Linux)
 	bash kill.sh
+
+build-frontend: ## Install npm deps and build React frontend → src/main/resources/static/
+	cd src/main/frontend && npm install --legacy-peer-deps && npm run build
+
+dev-frontend: ## Start Vite dev server on port 3000 (proxies API to localhost:8080)
+	cd src/main/frontend && npm run dev

@@ -1,0 +1,74 @@
+classDiagram
+    class StatementExportStrategy {
+        <<interface>>
+        +targetFormat() ConversionTargetFormat
+        +engine() ConversionEngine
+        +export(statement BankStatement) GeneratedBankingFile
+        +key() StatementExportStrategyKey
+    }
+
+    class StatementExportStrategyFactory {
+        -strategies Map~StatementExportStrategyKey, StatementExportStrategy~
+        +getStrategy(fmt, eng) StatementExportStrategy
+        +hasStrategy(fmt, eng) boolean
+    }
+
+    class AbstractMtProwideStrategy {
+        <<abstract>>
+        #formatSwiftAmount(amount) String
+        #formatBalanceLine(stmt, balance, date, credit) String
+        #formatField61(tx) String
+        #formatField86(tx) String
+    }
+
+    class InternalToMt940ProwideStrategy {
+        +targetFormat() MT940
+        +engine() PROWIDE
+        +export(statement) GeneratedBankingFile
+    }
+    class InternalToMt942ProwideStrategy {
+        +targetFormat() MT942
+        +engine() PROWIDE
+        +export(statement) GeneratedBankingFile
+    }
+    class InternalToCamt052ProwideStrategy {
+        +targetFormat() CAMT052
+        +engine() PROWIDE
+        +export(statement) GeneratedBankingFile
+    }
+    class InternalToCamt053ProwideStrategy {
+        +targetFormat() CAMT053
+        +engine() PROWIDE
+        +export(statement) GeneratedBankingFile
+    }
+    class InternalToMt940VelocityStrategy {
+        +targetFormat() MT940
+        +engine() VELOCITY
+        +export(statement) GeneratedBankingFile
+    }
+    class InternalToMt942VelocityStrategy {
+        +targetFormat() MT942
+        +engine() VELOCITY
+        +export(statement) GeneratedBankingFile
+    }
+    class InternalToCamt052VelocityStrategy {
+        +targetFormat() CAMT052
+        +engine() VELOCITY
+        +export(statement) GeneratedBankingFile
+    }
+    class InternalToCamt053VelocityStrategy {
+        +targetFormat() CAMT053
+        +engine() VELOCITY
+        +export(statement) GeneratedBankingFile
+    }
+
+    StatementExportStrategy <|.. AbstractMtProwideStrategy
+    StatementExportStrategy <|.. InternalToCamt052ProwideStrategy
+    StatementExportStrategy <|.. InternalToCamt053ProwideStrategy
+    StatementExportStrategy <|.. InternalToMt940VelocityStrategy
+    StatementExportStrategy <|.. InternalToMt942VelocityStrategy
+    StatementExportStrategy <|.. InternalToCamt052VelocityStrategy
+    StatementExportStrategy <|.. InternalToCamt053VelocityStrategy
+    AbstractMtProwideStrategy <|-- InternalToMt940ProwideStrategy
+    AbstractMtProwideStrategy <|-- InternalToMt942ProwideStrategy
+    StatementExportStrategyFactory --> StatementExportStrategy

@@ -1,0 +1,26 @@
+erDiagram
+    bank_statements {
+        bigint id PK
+        varchar statement_reference
+        varchar account_iban
+        varchar account_currency
+        date statement_date
+        decimal opening_balance
+        decimal closing_balance
+    }
+
+    bank_transactions {
+        bigint id PK
+        bigint statement_id FK
+        date booking_date
+        date value_date
+        decimal amount
+        varchar currency
+        varchar debit_credit_indicator
+        varchar transaction_reference
+        varchar counterparty_name
+        varchar remittance_information
+        varchar bank_transaction_code
+    }
+
+    bank_statements ||--o{ bank_transactions : "contains"

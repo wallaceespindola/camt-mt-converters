@@ -1,0 +1,56 @@
+@startuml conversion-flow
+!theme plain
+
+skinparam backgroundColor #FAFAFA
+skinparam rectangle {
+  BackgroundColor #FFF3E0
+  BorderColor #E64A19
+}
+skinparam arrow {
+  Color #E64A19
+}
+
+rectangle "Internal Domain Model\nBankStatement / BankTransaction" as INPUT
+
+together {
+  rectangle "3-Stage Validation" as VALIDATE {
+    rectangle "1. Internal Model\nValidator" as VA
+    rectangle "2. MT Re-parse\nvia Prowide" as VB
+    rectangle "3. camt XSD\nValidation" as VC
+  }
+}
+
+together {
+  rectangle "Prowide Engine" as PROWIDE {
+    rectangle "MT940 via\nProwide Core" as P1
+    rectangle "MT942 via\nProwide Core" as P2
+    rectangle "camt.052 via\nProwide ISO 20022" as P3
+    rectangle "camt.053 via\nProwide ISO 20022" as P4
+  }
+
+  rectangle "Velocity Engine" as VELOCITY {
+    rectangle "MT940 via\nmt940.vm" as V1
+    rectangle "MT942 via\nmt942.vm" as V2
+    rectangle "camt.052 via\ncamt052.vm" as V3
+    rectangle "camt.053 via\ncamt053.vm" as V4
+  }
+}
+
+collections "statement-N.mt940\ntext/plain" as OUT1
+collections "statement-N.mt942\ntext/plain" as OUT2
+collections "statement-N.camt052.xml\napplication/xml" as OUT3
+collections "statement-N.camt053.xml\napplication/xml" as OUT4
+
+INPUT --> VALIDATE
+VALIDATE --> PROWIDE
+VALIDATE --> VELOCITY
+P1 --> OUT1
+P2 --> OUT2
+P3 --> OUT3
+P4 --> OUT4
+V1 --> OUT1
+V2 --> OUT2
+V3 --> OUT3
+V4 --> OUT4
+
+@enduml

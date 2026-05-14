@@ -1,0 +1,23 @@
+graph TB
+    subgraph DEV["Developer Machine"]
+        SRC[Source Code]
+        MVN[Maven Build]
+        JAR[Spring Boot JAR]
+        STATIC["src/main/resources/static/\nPre-built React bundle"]
+    end
+
+    subgraph RUNTIME["Runtime — localhost:8080"]
+        SB[Spring Boot\ncamt-mt-converters-1.0.0-SNAPSHOT.jar]
+        H2[(H2 In-Memory DB\nbankingdb)]
+        OUTPUT[output/ directory\nGenerated banking files]
+        STATIC_SRV[Static resources\nReact SPA at /]
+    end
+
+    SRC --> MVN --> JAR
+    JAR --> SB
+    SB --> H2
+    SB --> OUTPUT
+    STATIC --> SB --> STATIC_SRV
+
+    CLIENT[Browser\nlocalhost:8080] --> STATIC_SRV
+    CLIENT --> SB

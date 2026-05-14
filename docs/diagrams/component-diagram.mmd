@@ -1,0 +1,55 @@
+graph LR
+    subgraph API["api/"]
+        RC[RandomStatementController]
+        CC[StatementConversionController]
+        GEH[GlobalExceptionHandler]
+    end
+    subgraph BATCH["batch/"]
+        IR[BankStatementItemReader]
+        IP[StatementExportProcessor]
+        IW[BankingFileWriter]
+        BJS[BatchJobService]
+        BML[BatchJobMetricsListener]
+    end
+    subgraph CONV["conversion/"]
+        SSF[StatementExportStrategyFactory]
+        SSI[StatementExportStrategy]
+        subgraph PROWIDE["strategy/prowide/"]
+            PM940[Mt940ProwideStrategy]
+            PM942[Mt942ProwideStrategy]
+            PC052[Camt052ProwideStrategy]
+            PC053[Camt053ProwideStrategy]
+        end
+        subgraph VELOCITY["strategy/velocity/"]
+            VM940[Mt940VelocityStrategy]
+            VM942[Mt942VelocityStrategy]
+            VC052[Camt052VelocityStrategy]
+            VC053[Camt053VelocityStrategy]
+        end
+    end
+    subgraph SERVICES["services/"]
+        RSS[RandomStatementService]
+        BSM[BankStatementMapper]
+        ISV[InternalStatementValidator]
+        VR[VelocityRenderer]
+    end
+    subgraph DOMAIN["domain/ + persistence/"]
+        BS[BankStatement record]
+        BT[BankTransaction record]
+        BSE[BankStatementEntity]
+        BTE[BankTransactionEntity]
+        REPO[BankStatementRepository]
+    end
+
+    RC --> RSS
+    CC --> BJS
+    BJS --> IR & IP & IW
+    IP --> BSM & ISV & SSF
+    SSF --> SSI
+    SSI <|.. PM940 & PM942 & PC052 & PC053
+    SSI <|.. VM940 & VM942 & VC052 & VC053
+    VM940 & VM942 & VC052 & VC053 --> VR
+    BSM --> BSE
+    IR --> REPO
+    REPO --> BSE
+    BSE --> BTE

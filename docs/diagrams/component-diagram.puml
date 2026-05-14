@@ -1,0 +1,88 @@
+@startuml component-diagram
+!theme plain
+
+skinparam backgroundColor #FAFAFA
+skinparam component {
+  BackgroundColor #FFF3E0
+  BorderColor #E64A19
+}
+skinparam package {
+  BackgroundColor #FAFAFA
+  BorderColor #BDBDBD
+}
+
+package "api/" as API {
+  [RandomStatementController] as RC
+  [StatementConversionController] as CC
+  [GlobalExceptionHandler] as GEH
+}
+
+package "batch/" as BATCH {
+  [BankStatementItemReader] as IR
+  [StatementExportProcessor] as IP
+  [BankingFileWriter] as IW
+  [BatchJobService] as BJS
+  [BatchJobMetricsListener] as BML
+}
+
+package "conversion/" as CONV {
+  [StatementExportStrategyFactory] as SSF
+  interface "StatementExportStrategy" as SSI
+
+  package "strategy/prowide/" as PROWIDE {
+    [Mt940ProwideStrategy] as PM940
+    [Mt942ProwideStrategy] as PM942
+    [Camt052ProwideStrategy] as PC052
+    [Camt053ProwideStrategy] as PC053
+  }
+
+  package "strategy/velocity/" as VELOCITY {
+    [Mt940VelocityStrategy] as VM940
+    [Mt942VelocityStrategy] as VM942
+    [Camt052VelocityStrategy] as VC052
+    [Camt053VelocityStrategy] as VC053
+  }
+}
+
+package "services/" as SERVICES {
+  [RandomStatementService] as RSS
+  [BankStatementMapper] as BSM
+  [InternalStatementValidator] as ISV
+  [VelocityRenderer] as VR
+}
+
+package "domain/ + persistence/" as DOMAIN {
+  [BankStatement record] as BS
+  [BankTransaction record] as BT
+  [BankStatementEntity] as BSE
+  [BankTransactionEntity] as BTE
+  [BankStatementRepository] as REPO
+}
+
+RC --> RSS
+CC --> BJS
+BJS --> IR
+BJS --> IP
+BJS --> IW
+IP --> BSM
+IP --> ISV
+IP --> SSF
+SSF --> SSI
+SSI <|.. PM940
+SSI <|.. PM942
+SSI <|.. PC052
+SSI <|.. PC053
+SSI <|.. VM940
+SSI <|.. VM942
+SSI <|.. VC052
+SSI <|.. VC053
+VM940 --> VR
+VM942 --> VR
+VC052 --> VR
+VC053 --> VR
+BSM --> BSE
+IR --> REPO
+REPO --> BSE
+BSE --> BTE
+
+@enduml
