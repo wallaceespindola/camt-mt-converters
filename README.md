@@ -1,3 +1,9 @@
+<p align="center">
+  <img src="docs/images/swift-logo.svg" alt="SWIFT" height="65"/>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="docs/images/iso20022-logo.svg" alt="ISO 20022" height="65"/>
+</p>
+
 # Banking Statement Converter Platform
 
 [![Build](https://github.com/wallaceespindola/camt-mt-converters/actions/workflows/build.yml/badge.svg)](https://github.com/wallaceespindola/camt-mt-converters/actions/workflows/build.yml)
@@ -22,6 +28,41 @@ This platform is a production-ready reference implementation for banking format 
 Two parallel conversion engines are available behind a single `StatementExportStrategy` interface. The **Prowide engine** uses strongly-typed, standards-aware Java objects for MT940, MT942, camt.052, and camt.053. The **Velocity engine** uses declarative `.vm` templates for the same four formats — both engines pass the same post-generation validation before any file is written to disk.
 
 The system is designed to be extended without modification: adding a new format or engine means implementing one interface and annotating the class `@Component`. The `StatementExportStrategyFactory` auto-discovers all registered strategies at startup via Spring dependency injection — no `if`/`switch` chains in the resolution path.
+
+---
+
+## SWIFT MT and ISO 20022 in European Banking
+
+### SWIFT MT (Message Types)
+
+SWIFT MT messages are the legacy text-based messaging standard used by banks and financial institutions globally for decades. In the European banking landscape:
+
+- **MT940** — Customer Statement Message: the backbone of end-of-day account reporting in European cash management. Banks including Deutsche Bank, BNP Paribas, Société Générale, ING, and ABN AMRO provide MT940 files to corporate clients for automated reconciliation.
+- **MT942** — Interim Transaction Report: intraday liquidity reporting widely used by European corporates and their banks (e.g., Commerzbank, UniCredit, Santander) to monitor real-time cash positions before the end-of-day statement is issued.
+- **SEPA compliance**: European banks producing MT940/MT942 embed SEPA-compliant structured remittance data (field 86) aligned with the EPC's pain/camt rulebooks, enabling straight-through processing in ERP systems (SAP, Oracle Financials).
+- **ECB and TARGET2**: The European Central Bank's TARGET2 RTGS system uses SWIFT MT messages for interbank settlement instructions across the Eurozone's 20 member states.
+
+### ISO 20022 / camt (Cash Management)
+
+ISO 20022 is the global XML-based financial messaging standard mandated by the European Payments Council (EPC) and progressively replacing SWIFT MT across European market infrastructures:
+
+- **camt.052** (Bank-to-Customer Account Report): intraday reporting replacing MT942. Adopted by TIPS (TARGET Instant Payment Settlement) and mandated in the ECB's ISO 20022 migration roadmap for TARGET2/T2S from November 2022.
+- **camt.053** (Bank-to-Customer Statement): end-of-day reporting replacing MT940. Mandatory for all SEPA Credit Transfer and SEPA Direct Debit reporting under EPC guidelines. Supported by all major EU clearinghouses — STEP2 (EBA Clearing), CORE (France), and EQUENS (Netherlands/Germany).
+- **SWIFT MX migration**: SWIFT's global MT-to-MX migration (completed November 2025) requires all correspondent banks to support ISO 20022 natively. European banks — Barclays, HSBC, Rabobank, KBC, Erste Group — are fully migrated.
+- **PSD2 / Open Banking**: ISO 20022 camt messages are the standard data format for Account Information Service Providers (AISPs) accessing bank account data under the EU's Payment Services Directive 2.
+- **European Central Bank**: The ECB's Consolidated Tape and T2 consolidation project mandates camt.052/053 for all Eurosystem participants reporting to the TARGET Services platform.
+
+### Format Adoption Timeline in Europe
+
+| Year | Milestone |
+|------|-----------|
+| 2008 | SEPA Credit Transfer goes live — ISO 20022 pain.001/pain.002 adopted by EPC |
+| 2014 | SEPA migration deadline — all EUR payments in the Single Euro Payments Area use ISO 20022 |
+| 2017 | ECB announces TARGET2 ISO 20022 migration roadmap |
+| 2019 | EBA Clearing's STEP2 adds camt.054 credit notification support |
+| 2022 | TARGET2/T2S consolidated platform goes live with full ISO 20022 support (Nov) |
+| 2023 | SWIFT mandates ISO 20022 for all cross-border payments in MX format |
+| 2025 | SWIFT MT coexistence period ends — ISO 20022 is the sole standard for new messages |
 
 ---
 

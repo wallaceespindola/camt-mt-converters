@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 70" width="220" height="70">
+  <!-- SWIFT brand colours: navy #00275D, gold/orange accent -->
+  <rect width="220" height="70" rx="6" fill="#00275D"/>
+  <!-- Left accent bar -->
+  <rect x="0" y="0" width="8" height="70" rx="6" fill="#E87722"/>
+  <rect x="4" y="0" width="4" height="70" fill="#E87722"/>
+  <!-- SWIFT wordmark -->
+  <text x="28" y="44" font-family="Arial Black, Arial, sans-serif" font-size="30" font-weight="900"
+        fill="#FFFFFF" letter-spacing="3">SWIFT</text>
+  <!-- Tagline -->
+  <text x="28" y="60" font-family="Arial, sans-serif" font-size="9" fill="#A8C0D6" letter-spacing="1">
+    Financial Messaging
+  </text>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 70" width="220" height="70">
+  <!-- ISO 20022 brand colours: blue #0070AD -->
+  <rect width="220" height="70" rx="6" fill="#0070AD"/>
+  <!-- Top accent stripe -->
+  <rect x="0" y="0" width="220" height="6" rx="3" fill="#005A8E"/>
+  <!-- ISO badge box -->
+  <rect x="10" y="14" width="38" height="38" rx="4" fill="#FFFFFF"/>
+  <text x="29" y="28" font-family="Arial Black, Arial, sans-serif" font-size="9"
+        font-weight="900" fill="#0070AD" text-anchor="middle">ISO</text>
+  <rect x="12" y="31" width="34" height="2" fill="#0070AD" opacity="0.3"/>
+  <text x="29" y="44" font-family="Arial Black, Arial, sans-serif" font-size="7.5"
+        font-weight="900" fill="#0070AD" text-anchor="middle">20022</text>
+  <!-- Main label -->
+  <text x="58" y="36" font-family="Arial Black, Arial, sans-serif" font-size="22"
+        font-weight="900" fill="#FFFFFF" letter-spacing="1">20022</text>
+  <!-- Tagline -->
+  <text x="58" y="55" font-family="Arial, sans-serif" font-size="9"
+        fill="#A8D0E8" letter-spacing="0.5">Universal Financial Messaging</text>
+</svg>
