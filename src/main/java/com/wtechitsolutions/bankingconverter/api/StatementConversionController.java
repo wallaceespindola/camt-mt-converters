@@ -1,0 +1,146 @@
+package com.wtechitsolutions.bankingconverter.api;
+
+import com.wtechitsolutions.bankingconverter.api.dto.ConversionJobRequest;
+import com.wtechitsolutions.bankingconverter.api.dto.ConversionJobResponse;
+import com.wtechitsolutions.bankingconverter.api.dto.ConversionJobStatusResponse;
+import com.wtechitsolutions.bankingconverter.batch.BatchJobService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
+
+/**
+ * REST controller for banking statement format conversion.
+ *
+ * <p>Delegates to {@link BatchJobService} to launch Spring Batch conversion jobs and exposes
+ * read-only endpoints for querying job execution history and individual job status.
+ *
+ * @author Wallace Espindola (wallace.espindola@gmail.com)
+ */
+@RestController
+@RequestMapping("/api/conversions")
+@Tag(name = "Conversions", description = "Banking statement format conversion via Spring Batch")
+public class StatementConversionController {
+
+    private static final Logger log = LoggerFactory.getLogger(StatementConversionController.class);
+
+    private final BatchJobService batchJobService;
+
+    public StatementConversionController(BatchJobService batchJobService) {
+        this.batchJobService = batchJobService;
+    }
+
+    /**
+     * Launches a synchronous Spring Batch conversion job for the specified statement.
+     *
+     * @param request validated request body containing the statement ID, target format, and engine
+     * @return a {@link ConversionJobResponse} with the job execution result and generated file content
+     */
+    @PostMapping
+    @Operation(
+            summary = "Launch a banking statement conversion job",
+            description = "Triggers a Spring Batch job to convert the specified statement to the "
+                    + "requested format using the selected engine.")
+    public ResponseEntity<ConversionJobResponse> convert(@RequestBody @Valid ConversionJobRequest request) {
+        log.info("Launching conversion: statementId={}, format={}, engine={}",
+                request.statementId(), request.targetFormat(), request.engine());
+        BatchJobService.BatchJobResult result = batchJobService.launch(
+                request.statementId(), request.targetFormat(), request.engine());
+        return ResponseEntity.ok(new ConversionJobResponse(
+                result.jobExecutionId(),
+                request.targetFormat(),
+                request.engine(),
+                result.status(),
+                result.outputFile(),
+                result.fileContent(),
+                Instant.now()
+        ));
+    }
+
+    /**
+     * Returns the most recent conversion job executions (up to 50), ordered by execution ID descending.
+     *
+     * @return list of {@link ConversionJobStatusResponse} objects representing past executions
+     */
+    @GetMapping("/jobs")
+    @Operation(summary = "Retrieve the last 50 conversion job executions")
+    public ResponseEntity<List<ConversionJobStatusResponse>> listJobs() {
+        List<ConversionJobStatusResponse> history = batchJobService.getHistory().stream()
+                .map(this::toStatusResponse)
+                .toList();
+        return ResponseEntity.ok(history);
+    }
+
+    /**
+     * Returns the status of a specific conversion job execution by its Spring Batch execution ID.
+     *
+     * @param jobId the Spring Batch job execution ID
+     * @return the {@link ConversionJobStatusResponse}, or {@code 404} if not found
+     */
+    @GetMapping("/jobs/{jobId}")
+    @Operation(summary = "Get the status of a specific conversion job")
+    public ResponseEntity<ConversionJobStatusResponse> getJob(
+            @PathVariable @Parameter(description = "Spring Batch job execution ID") Long jobId) {
+        JobExecution execution = batchJobService.getJobExecution(jobId);
+        if (execution == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(toStatusResponse(execution));
+    }
+
+    // -------------------------------------------------------------------------
+    // Private helpers
+    // -------------------------------------------------------------------------
+
+    private ConversionJobStatusResponse toStatusResponse(JobExecution ex) {
+        JobParameters params = ex.getJobParameters();
+        String targetFormat = params.getString("targetFormat", "UNKNOWN");
+        String engine = params.getString("engine", "UNKNOWN");
+
+        LocalDateTime start = ex.getStartTime();
+        LocalDateTime end = ex.getEndTime();
+        long durationMs = (start != null && end != null) ? Duration.between(start, end).toMillis() : 0;
+
+        Instant startInstant = start != null ? start.toInstant(ZoneOffset.UTC) : null;
+        Instant endInstant = end != null ? end.toInstant(ZoneOffset.UTC) : null;
+        Instant createInstant = ex.getCreateTime() != null ? ex.getCreateTime().toInstant(ZoneOffset.UTC) : null;
+
+        String outputFile = ex.getStepExecutions().stream()
+                .findFirst()
+                .map(s -> s.getExecutionContext().getString("outputFile", ""))
+                .orElse("");
+
+        String exitDescription = ex.getExitStatus() != null ? ex.getExitStatus().getExitDescription() : "";
+
+        return new ConversionJobStatusResponse(
+                ex.getId(),
+                ex.getStatus().name(),
+                exitDescription,
+                targetFormat,
+                engine,
+                outputFile,
+                createInstant,
+                startInstant,
+                endInstant,
+                durationMs,
+                Instant.now()
+        );
+    }
+}

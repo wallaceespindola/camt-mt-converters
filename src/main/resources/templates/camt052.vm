@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.052.001.08">
+  <BkToCstmrAcctRpt>
+    <GrpHdr>
+      <MsgId>${statementRef}</MsgId>
+      <CreDtTm>${creationDateTime}</CreDtTm>
+    </GrpHdr>
+    <Rpt>
+      <Id>${statementRef}</Id>
+      <Acct>
+        <Id><IBAN>${accountIban}</IBAN></Id>
+        <Ccy>${currency}</Ccy>
+      </Acct>
+#foreach($tx in $transactions)
+      <Ntry>
+        <Amt Ccy="${tx.currency}">${tx.amount}</Amt>
+        <CdtDbtInd>${tx.cdtDbtInd}</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>${tx.bookingDate}</Dt></BookgDt>
+        <ValDt><Dt>${tx.valueDate}</Dt></ValDt>
+        <NtryDtls><TxDtls><RmtInf><Ustrd>${tx.narrative}</Ustrd></RmtInf></TxDtls></NtryDtls>
+      </Ntry>
+#end
+    </Rpt>
+  </BkToCstmrAcctRpt>
+</Document>

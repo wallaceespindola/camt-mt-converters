@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.052.001.08">
+  <BkToCstmrAcctRpt>
+    <GrpHdr>
+      <MsgId>CAMT052-20260514-001</MsgId>
+      <CreDtTm>2026-05-14T10:00:00</CreDtTm>
+    </GrpHdr>
+    <Rpt>
+      <Id>STMT-20260514-001</Id>
+      <Acct>
+        <Id>
+          <IBAN>DE89370400440532013000</IBAN>
+        </Id>
+        <Ccy>EUR</Ccy>
+      </Acct>
+      <Ntry>
+        <Amt Ccy="EUR">500.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-05-14</Dt></BookgDt>
+        <ValDt><Dt>2026-05-14</Dt></ValDt>
+        <NtryDtls>
+          <TxDtls>
+            <RmtInf>
+              <Ustrd>Payment from Customer A</Ustrd>
+            </RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+    </Rpt>
+  </BkToCstmrAcctRpt>
+</Document>

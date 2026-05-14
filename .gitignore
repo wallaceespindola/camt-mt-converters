@@ -1,24 +1,127 @@
-# Compiled class file
+# ===========================
+# Build and Runtime Artifacts
+# ===========================
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
 *.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
 *.jar
 *.war
-*.nar
 *.ear
 *.zip
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
+# ===========================
+# Application Output
+# ===========================
+output/
+logs/
+*.log
+
+# ===========================
+# IDE Files
+# ===========================
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+.factorypath
+
+# NetBeans
+nbproject/
+nbbuild/
+nbdist/
+.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ===========================
+# OS Files
+# ===========================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ===========================
+# AI Tool Files
+# ===========================
+
+# Cursor IDE
+.cursor/
+.cursorignore
+.cursorrules
+
+# GitHub Copilot
+copilot-instructions.md
+
+# Codeium / Windsurf
+.codeium/
+.windsurf/
+
+# Continue.dev
+.continue/
+
+# Tabnine
+.tabnine
+
+# ===========================
+# Secrets and Local Config
+# ===========================
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.jks
+*.pfx
+application-local.yml
+application-local.properties
+
+# ===========================
+# Logs (directory tracked via .gitkeep, content ignored)
+# ===========================
+logs/*.log
+logs/*.pid
+
+# ===========================
+# Misc
+# ===========================
+*.bak
+*.swp
+*.swo
+.mvn/wrapper/maven-wrapper.jar

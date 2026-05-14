@@ -1,0 +1,9 @@
+:20:${statementRef}
+:25:${accountIban}
+:28C:00001/001
+:60F:${openingBalance}
+#foreach($tx in $transactions)
+:61:${tx.field61}
+:86:${tx.narrative}
+#end
+:62F:${closingBalance}

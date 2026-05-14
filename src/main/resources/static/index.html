@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banking Statement Converter</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
+    h1 { color: #1976d2; }
+    .card { border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin: 16px 0; }
+    a { color: #1976d2; }
+    code { background: #f5f5f5; padding: 2px 6px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Banking Statement Converter Platform</h1>
+  <p>Converts internal domain data to MT940, MT942, camt.052 and camt.053 banking files.</p>
+  <div class="card">
+    <h2>Quick Start</h2>
+    <p>1. Generate random data: <code>POST /api/random-statements</code></p>
+    <p>2. Run conversion: <code>POST /api/conversions</code></p>
+    <p>3. Check status: <code>GET /api/conversions/jobs/{jobId}</code></p>
+  </div>
+  <div class="card">
+    <h2>Links</h2>
+    <ul>
+      <li><a href="/swagger-ui.html">Swagger UI</a> (dev profile only)</li>
+      <li><a href="/actuator/health">Health</a></li>
+      <li><a href="/actuator/info">Info</a></li>
+      <li><a href="/h2-console">H2 Console</a> (dev profile only)</li>
+    </ul>
+  </div>
+</body>
+</html>
