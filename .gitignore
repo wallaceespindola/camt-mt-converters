@@ -28,17 +28,20 @@ logs/
 # IDE Files
 # ===========================
 
-# IntelliJ IDEA
+# IntelliJ IDEA / JetBrains
 .idea/
 *.iml
 *.iws
 *.ipr
 out/
 .idea_modules/
+*.tmproj
+.jetbrains/
 
 # VS Code
 .vscode/
 *.code-workspace
+.history/
 
 # Eclipse
 .classpath
@@ -46,6 +49,7 @@ out/
 .settings/
 bin/
 .factorypath
+*.launch
 
 # NetBeans
 nbproject/
@@ -55,6 +59,33 @@ nbdist/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
+
+# Vim / Neovim
+*.vim
+.nvim/
+Session.vim
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+.emacs.d/
+*.elc
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# TextMate
+*.tmproj
+*.tmworkspace
+
+# Zed
+.zed/
+
+# Xcode (for mixed projects)
+*.xcuserstate
+xcuserdata/
 
 # ===========================
 # OS Files
@@ -75,11 +106,18 @@ Desktop.ini
 $RECYCLE.BIN/
 
 # Linux
-*~
+.fuse_hidden*
+.directory
+.Trash-*
 
 # ===========================
 # AI Tool Files
 # ===========================
+
+# Claude / Anthropic
+CLAUDE.md
+CLAUDE.local.md
+.claude/
 
 # Cursor IDE
 .cursor/
@@ -88,16 +126,43 @@ $RECYCLE.BIN/
 
 # GitHub Copilot
 copilot-instructions.md
+.github/copilot-instructions.md
 
 # Codeium / Windsurf
 .codeium/
 .windsurf/
+.windsurfrules
 
 # Continue.dev
 .continue/
 
 # Tabnine
 .tabnine
+.tabnine_root
+
+# Aider
+.aider*
+
+# Gemini / Google AI
+GEMINI.md
+.gemini/
+
+# Amazon CodeWhisperer / Q
+.aws/amazonq/
+
+# Sourcegraph Cody
+.cody/
+
+# Devin
+.devin/
+
+# OpenAI / ChatGPT context files
+.chatgpt/
+
+# Generic AI context/rules files
+.ai/
+ai-instructions.md
+llm-context.md
 
 # ===========================
 # Secrets and Local Config
