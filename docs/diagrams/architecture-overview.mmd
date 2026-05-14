@@ -1,34 +1,61 @@
+%%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#555555', 'fontSize': '14px'}}}%%
 graph TB
-    subgraph Frontend["React SPA (MUI + Recharts)"]
-        UI[Dashboard / Generate / Runner / History / Charts / Diagrams]
+    subgraph Frontend["🖥  React SPA  —  MUI + Recharts + Mermaid"]
+        UI["Dashboard · Generate · Runner · History · Charts · Benchmark · Diagrams"]
     end
-    subgraph API["REST API Layer"]
-        RS["RandomStatementController<br/>POST /api/random-statements"]
-        CV["StatementConversionController<br/>POST /api/conversions<br/>GET /api/conversions/jobs"]
-        ACT["Spring Actuator<br/>/actuator/health  /actuator/info"]
+    subgraph API["🔌  REST API Layer"]
+        RS["RandomStatementController\nPOST /api/random-statements"]
+        CV["StatementConversionController\nPOST /api/conversions\nGET /api/conversions/jobs"]
+        ACT["Spring Actuator\n/actuator/health · /actuator/info"]
     end
-    subgraph Batch["Spring Batch Pipeline"]
+    subgraph Batch["⚙  Spring Batch Pipeline"]
         JL[JobLauncher]
         JOB[statementExportJob]
-        STEP["statementExportStep<br/>chunk-size = 1"]
+        STEP["statementExportStep  chunk-size=1"]
         READER[BankStatementItemReader]
         PROC[StatementExportProcessor]
         WRITER[BankingFileWriter]
     end
-    subgraph Strategy["Strategy Pattern x 8"]
+    subgraph Strategy["🔀  Strategy Pattern  ×  8 Implementations"]
         SF[StatementExportStrategyFactory]
-        P4["4 Prowide Strategies<br/>(MT940, MT942, camt.052, camt.053)"]
-        V4["4 Velocity Strategies<br/>(MT940, MT942, camt.052, camt.053)"]
+        P4["Prowide Strategies\nMT940 · MT942 · camt.052 · camt.053"]
+        V4["Velocity Strategies\nMT940 · MT942 · camt.052 · camt.053"]
     end
-    subgraph Data["Data Layer — H2 In-Memory"]
+    subgraph Data["🗄  H2 In-Memory Database"]
         BS[(bank_statements)]
         BT[(bank_transactions)]
     end
-    OUTPUT[("output/<br/>*.mt940 *.mt942<br/>*.camt052.xml *.camt053.xml")]
+    OUTPUT[("📁  output/\n*.mt940 · *.mt942\n*.camt052.xml · *.camt053.xml")]
 
     UI --> API
     RS --> Data
     CV --> JL --> JOB --> STEP
     STEP --> READER --> Data
-    STEP --> PROC --> SF --> P4 & V4
+    STEP --> PROC --> SF
+    SF --> P4
+    SF --> V4
     STEP --> WRITER --> OUTPUT
+
+    classDef fe       fill:#E64A19,stroke:#BF360C,color:#fff
+    classDef api      fill:#1565C0,stroke:#0D47A1,color:#fff
+    classDef batch    fill:#2E7D32,stroke:#1B5E20,color:#fff
+    classDef factory  fill:#00838F,stroke:#006064,color:#fff
+    classDef prowide  fill:#BF360C,stroke:#7F0000,color:#fff
+    classDef velocity fill:#7B1FA2,stroke:#4A148C,color:#fff
+    classDef db       fill:#5D4037,stroke:#3E2723,color:#fff
+    classDef out      fill:#546E7A,stroke:#37474F,color:#fff
+
+    class UI fe
+    class RS,CV,ACT api
+    class JL,JOB,STEP,READER,PROC,WRITER batch
+    class SF factory
+    class P4 prowide
+    class V4 velocity
+    class BS,BT db
+    class OUTPUT out
+
+    style Frontend fill:#FFF3E0,stroke:#E64A19,stroke-width:2px
+    style API      fill:#E3F2FD,stroke:#1565C0,stroke-width:2px
+    style Batch    fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px
+    style Strategy fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px
+    style Data     fill:#EFEBE9,stroke:#5D4037,stroke-width:2px

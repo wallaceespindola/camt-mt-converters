@@ -1,17 +1,18 @@
+%%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#555555', 'fontSize': '13px'}}}%%
 graph LR
-    subgraph API["api/"]
+    subgraph API["🔌  api/"]
         RC[RandomStatementController]
         CC[StatementConversionController]
         GEH[GlobalExceptionHandler]
     end
-    subgraph BATCH["batch/"]
+    subgraph BATCH["⚙  batch/"]
         IR[BankStatementItemReader]
         IP[StatementExportProcessor]
         IW[BankingFileWriter]
         BJS[BatchJobService]
         BML[BatchJobMetricsListener]
     end
-    subgraph CONV["conversion/"]
+    subgraph CONV["🔀  conversion/"]
         SSF[StatementExportStrategyFactory]
         SSI[StatementExportStrategy]
         subgraph PROWIDE["strategy/prowide/"]
@@ -27,13 +28,13 @@ graph LR
             VC053[Camt053VelocityStrategy]
         end
     end
-    subgraph SERVICES["services/"]
+    subgraph SERVICES["🛠  services/"]
         RSS[RandomStatementService]
         BSM[BankStatementMapper]
         ISV[InternalStatementValidator]
         VR[VelocityRenderer]
     end
-    subgraph DOMAIN["domain/ + persistence/"]
+    subgraph DOMAIN["🗄  domain/ + persistence/"]
         BS[BankStatement record]
         BT[BankTransaction record]
         BSE[BankStatementEntity]
@@ -43,13 +44,52 @@ graph LR
 
     RC --> RSS
     CC --> BJS
-    BJS --> IR & IP & IW
-    IP --> BSM & ISV & SSF
+    BJS --> IR
+    BJS --> IP
+    BJS --> IW
+    IP --> BSM
+    IP --> ISV
+    IP --> SSF
     SSF --> SSI
-    SSI <|.. PM940 & PM942 & PC052 & PC053
-    SSI <|.. VM940 & VM942 & VC052 & VC053
-    VM940 & VM942 & VC052 & VC053 --> VR
+    PM940 -.->|implements| SSI
+    PM942 -.->|implements| SSI
+    PC052 -.->|implements| SSI
+    PC053 -.->|implements| SSI
+    VM940 -.->|implements| SSI
+    VM942 -.->|implements| SSI
+    VC052 -.->|implements| SSI
+    VC053 -.->|implements| SSI
+    VM940 --> VR
+    VM942 --> VR
+    VC052 --> VR
+    VC053 --> VR
     BSM --> BSE
     IR --> REPO
     REPO --> BSE
     BSE --> BTE
+
+    classDef apiCls    fill:#1565C0,stroke:#0D47A1,color:#fff
+    classDef batchCls  fill:#2E7D32,stroke:#1B5E20,color:#fff
+    classDef factCls   fill:#00838F,stroke:#006064,color:#fff
+    classDef intCls    fill:#455A64,stroke:#263238,color:#fff
+    classDef prowCls   fill:#BF360C,stroke:#7F0000,color:#fff
+    classDef velCls    fill:#7B1FA2,stroke:#4A148C,color:#fff
+    classDef svcCls    fill:#E65100,stroke:#BF360C,color:#fff
+    classDef domainCls fill:#5D4037,stroke:#3E2723,color:#fff
+
+    class RC,CC,GEH apiCls
+    class IR,IP,IW,BJS,BML batchCls
+    class SSF factCls
+    class SSI intCls
+    class PM940,PM942,PC052,PC053 prowCls
+    class VM940,VM942,VC052,VC053 velCls
+    class RSS,BSM,ISV,VR svcCls
+    class BS,BT,BSE,BTE,REPO domainCls
+
+    style API      fill:#E3F2FD,stroke:#1565C0,stroke-width:2px
+    style BATCH    fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px
+    style CONV     fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px
+    style PROWIDE  fill:#FBE9E7,stroke:#BF360C,stroke-width:2px
+    style VELOCITY fill:#EDE7F6,stroke:#7B1FA2,stroke-width:2px
+    style SERVICES fill:#FFF8E1,stroke:#E65100,stroke-width:2px
+    style DOMAIN   fill:#EFEBE9,stroke:#5D4037,stroke-width:2px

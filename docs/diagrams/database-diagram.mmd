@@ -1,26 +1,27 @@
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#5D4037', 'primaryTextColor': '#fff', 'primaryBorderColor': '#3E2723', 'lineColor': '#5D4037', 'secondaryColor': '#EFEBE9', 'tertiaryColor': '#FFF8E1', 'attributeBackgroundColorEven': '#FFF8E1', 'attributeBackgroundColorOdd': '#EFEBE9'}}}%%
 erDiagram
     bank_statements {
-        bigint id PK
-        varchar statement_reference
-        varchar account_iban
-        varchar account_currency
-        date statement_date
-        decimal opening_balance
-        decimal closing_balance
+        bigint id PK "Primary Key"
+        varchar statement_reference "Unique statement ref"
+        varchar account_iban "IBAN — ISO 13616"
+        varchar account_currency "ISO 4217 currency code"
+        date statement_date "Statement period date"
+        decimal opening_balance "Opening balance (Field 60F)"
+        decimal closing_balance "Closing balance (Field 62F)"
     }
 
     bank_transactions {
-        bigint id PK
-        bigint statement_id FK
-        date booking_date
-        date value_date
-        decimal amount
-        varchar currency
-        varchar debit_credit_indicator
-        varchar transaction_reference
-        varchar counterparty_name
-        varchar remittance_information
-        varchar bank_transaction_code
+        bigint id PK "Primary Key"
+        bigint statement_id FK "FK to bank_statements"
+        date booking_date "Booking date"
+        date value_date "Value date"
+        decimal amount "Transaction amount"
+        varchar currency "ISO 4217 currency code"
+        varchar debit_credit_indicator "DEBIT or CREDIT"
+        varchar transaction_reference "Transaction ref (Field 61)"
+        varchar counterparty_name "Counterparty name"
+        varchar remittance_information "Payment narrative (Field 86)"
+        varchar bank_transaction_code "BTC domain code"
     }
 
     bank_statements ||--o{ bank_transactions : "contains"

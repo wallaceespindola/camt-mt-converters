@@ -1,3 +1,4 @@
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#00838F', 'primaryTextColor': '#fff', 'primaryBorderColor': '#006064', 'lineColor': '#555555', 'secondaryColor': '#E3F2FD', 'tertiaryColor': '#F3E5F5'}}}%%
 classDiagram
     class StatementExportStrategy {
         <<interface>>
@@ -8,7 +9,7 @@ classDiagram
     }
 
     class StatementExportStrategyFactory {
-        -strategies Map~StatementExportStrategyKey, StatementExportStrategy~
+        -strategies Map~Key, Strategy~
         +getStrategy(fmt, eng) StatementExportStrategy
         +hasStrategy(fmt, eng) boolean
     }
@@ -16,9 +17,10 @@ classDiagram
     class AbstractMtProwideStrategy {
         <<abstract>>
         #formatSwiftAmount(amount) String
-        #formatBalanceLine(stmt, balance, date, credit) String
+        #formatBalanceLine(stmt, bal, date) String
         #formatField61(tx) String
         #formatField86(tx) String
+        #truncate(value, max) String
     }
 
     class InternalToMt940ProwideStrategy {
@@ -41,6 +43,7 @@ classDiagram
         +engine() PROWIDE
         +export(statement) GeneratedBankingFile
     }
+
     class InternalToMt940VelocityStrategy {
         +targetFormat() MT940
         +engine() VELOCITY
@@ -72,3 +75,15 @@ classDiagram
     AbstractMtProwideStrategy <|-- InternalToMt940ProwideStrategy
     AbstractMtProwideStrategy <|-- InternalToMt942ProwideStrategy
     StatementExportStrategyFactory --> StatementExportStrategy
+
+    style StatementExportStrategy         fill:#00838F,stroke:#006064,color:#fff
+    style StatementExportStrategyFactory  fill:#00838F,stroke:#006064,color:#fff
+    style AbstractMtProwideStrategy       fill:#E65100,stroke:#BF360C,color:#fff
+    style InternalToMt940ProwideStrategy  fill:#BF360C,stroke:#7F0000,color:#fff
+    style InternalToMt942ProwideStrategy  fill:#BF360C,stroke:#7F0000,color:#fff
+    style InternalToCamt052ProwideStrategy fill:#BF360C,stroke:#7F0000,color:#fff
+    style InternalToCamt053ProwideStrategy fill:#BF360C,stroke:#7F0000,color:#fff
+    style InternalToMt940VelocityStrategy fill:#7B1FA2,stroke:#4A148C,color:#fff
+    style InternalToMt942VelocityStrategy fill:#7B1FA2,stroke:#4A148C,color:#fff
+    style InternalToCamt052VelocityStrategy fill:#7B1FA2,stroke:#4A148C,color:#fff
+    style InternalToCamt053VelocityStrategy fill:#7B1FA2,stroke:#4A148C,color:#fff

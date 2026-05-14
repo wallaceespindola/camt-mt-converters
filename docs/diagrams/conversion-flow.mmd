@@ -1,30 +1,31 @@
+%%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#555555', 'fontSize': '14px'}}}%%
 flowchart LR
-    INPUT[Internal Domain Model\nBankStatement\nBankTransaction]
+    INPUT["📄  Internal Domain Model\nBankStatement · BankTransaction"]
 
-    subgraph PROWIDE["Prowide Engine"]
-        P1[MT940 via\nProwide Core]
-        P2[MT942 via\nProwide Core]
-        P3[camt.052 via\nProwide ISO 20022]
-        P4[camt.053 via\nProwide ISO 20022]
+    subgraph VALIDATE["🛡  3-Stage Validation"]
+        VA["① Internal Model\nValidator"]
+        VB["② MT Re-parse\nvia Prowide Core"]
+        VC["③ camt XSD\nISO 20022 Schema"]
     end
 
-    subgraph VELOCITY["Velocity Engine"]
-        V1[MT940 via\nmt940.vm]
-        V2[MT942 via\nmt942.vm]
-        V3[camt.052 via\ncamt052.vm]
-        V4[camt.053 via\ncamt053.vm]
+    subgraph PROWIDE["🔶  Prowide Engine"]
+        P1["MT940\nProwide Core"]
+        P2["MT942\nProwide Core"]
+        P3["camt.052\nProwide ISO 20022"]
+        P4["camt.053\nProwide ISO 20022"]
     end
 
-    subgraph VALIDATE["3-Stage Validation"]
-        VA[1 Internal Model\nValidator]
-        VB[2 MT Re-parse\nvia Prowide]
-        VC[3 camt XSD\nValidation]
+    subgraph VELOCITY["🟣  Velocity Engine"]
+        V1["MT940\nmt940.vm"]
+        V2["MT942\nmt942.vm"]
+        V3["camt.052\ncamt052.vm"]
+        V4["camt.053\ncamt053.vm"]
     end
 
-    OUT1["statement-N.mt940\ntext/plain"]
-    OUT2["statement-N.mt942\ntext/plain"]
-    OUT3["statement-N.camt052.xml\napplication/xml"]
-    OUT4["statement-N.camt053.xml\napplication/xml"]
+    OUT1["📄  statement-N.mt940\nSWIFT MT940  text/plain"]
+    OUT2["📄  statement-N.mt942\nSWIFT MT942  text/plain"]
+    OUT3["📋  statement-N.camt052.xml\nISO 20022  application/xml"]
+    OUT4["📋  statement-N.camt053.xml\nISO 20022  application/xml"]
 
     INPUT --> VALIDATE
     VALIDATE --> PROWIDE
@@ -37,3 +38,21 @@ flowchart LR
     V2 --> OUT2
     V3 --> OUT3
     V4 --> OUT4
+
+    classDef input   fill:#546E7A,stroke:#37474F,color:#fff
+    classDef val     fill:#F57F17,stroke:#E65100,color:#fff
+    classDef prowide fill:#BF360C,stroke:#7F0000,color:#fff
+    classDef vel     fill:#7B1FA2,stroke:#4A148C,color:#fff
+    classDef mt      fill:#003087,stroke:#001A52,color:#fff
+    classDef camt    fill:#0070AD,stroke:#004E7A,color:#fff
+
+    class INPUT input
+    class VA,VB,VC val
+    class P1,P2,P3,P4 prowide
+    class V1,V2,V3,V4 vel
+    class OUT1,OUT2 mt
+    class OUT3,OUT4 camt
+
+    style VALIDATE fill:#FFF8E1,stroke:#F57F17,stroke-width:2px
+    style PROWIDE  fill:#FBE9E7,stroke:#BF360C,stroke-width:2px
+    style VELOCITY fill:#EDE7F6,stroke:#7B1FA2,stroke-width:2px

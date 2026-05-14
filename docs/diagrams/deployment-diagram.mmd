@@ -1,23 +1,53 @@
+%%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#555555', 'fontSize': '14px'}}}%%
 graph TB
-    subgraph DEV["Developer Machine"]
-        SRC[Source Code]
-        MVN[Maven Build]
-        JAR[Spring Boot JAR]
-        STATIC["src/main/resources/static/\nPre-built React bundle"]
+    subgraph DEV["💻  Developer Machine  —  Build"]
+        SRC["Source Code\nsrc/main/java + resources"]
+        FE_SRC["Frontend Source\nsrc/main/frontend\nReact 19 + MUI + Vite"]
+        STATIC["Pre-built React Bundle\nsrc/main/resources/static/"]
+        MVN["Maven Build\nmvn clean package"]
+        JAR["Spring Boot JAR\ncamt-mt-converters-1.0.0-SNAPSHOT.jar"]
+        FE_SRC --> STATIC
+        SRC --> MVN
+        STATIC --> MVN
+        MVN --> JAR
     end
 
-    subgraph RUNTIME["Runtime — localhost:8080"]
-        SB[Spring Boot\ncamt-mt-converters-1.0.0-SNAPSHOT.jar]
-        H2[(H2 In-Memory DB\nbankingdb)]
-        OUTPUT[output/ directory\nGenerated banking files]
-        STATIC_SRV[Static resources\nReact SPA at /]
+    subgraph RUNTIME["🚀  Runtime  —  localhost:8080"]
+        SB["Spring Boot App\ncamt-mt-converters-1.0.0-SNAPSHOT.jar"]
+        H2[("H2 In-Memory DB\nbankingdb\nbank_statements · bank_transactions")]
+        OUTPUT["output/\nGenerated banking files\n*.mt940 · *.mt942 · *.xml"]
+        STATIC_SRV["Static Resources\nReact SPA served at /"]
+        SB --> H2
+        SB --> OUTPUT
+        SB --> STATIC_SRV
     end
 
-    SRC --> MVN --> JAR
+    subgraph BROWSER["🌐  Browser  —  localhost:8080"]
+        SPA["React SPA\nDashboard · Runner · Charts · Benchmark"]
+        SWAGGER["Swagger UI\n/swagger-ui.html\ndev profile only"]
+        ACTUATOR["Actuator\n/actuator/health · /actuator/info"]
+    end
+
     JAR --> SB
-    SB --> H2
-    SB --> OUTPUT
-    STATIC --> SB --> STATIC_SRV
+    SPA --> STATIC_SRV
+    SPA --> SB
+    SWAGGER --> SB
+    ACTUATOR --> SB
 
-    CLIENT[Browser\nlocalhost:8080] --> STATIC_SRV
-    CLIENT --> SB
+    classDef buildCls   fill:#37474F,stroke:#263238,color:#fff
+    classDef feCls      fill:#E64A19,stroke:#BF360C,color:#fff
+    classDef runtimeCls fill:#1565C0,stroke:#0D47A1,color:#fff
+    classDef dbCls      fill:#5D4037,stroke:#3E2723,color:#fff
+    classDef outCls     fill:#546E7A,stroke:#37474F,color:#fff
+    classDef browserCls fill:#2E7D32,stroke:#1B5E20,color:#fff
+
+    class SRC,MVN,JAR buildCls
+    class FE_SRC,STATIC feCls
+    class SB,STATIC_SRV runtimeCls
+    class H2 dbCls
+    class OUTPUT outCls
+    class SPA,SWAGGER,ACTUATOR browserCls
+
+    style DEV     fill:#F5F5F5,stroke:#37474F,stroke-width:2px
+    style RUNTIME fill:#E3F2FD,stroke:#1565C0,stroke-width:2px
+    style BROWSER fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px
