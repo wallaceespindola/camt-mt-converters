@@ -69,45 +69,46 @@ ISO 20022 is the global XML-based financial messaging standard mandated by the E
 ## Architecture
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#555555', 'fontSize': '14px'}}}%%
 graph TB
-    subgraph CLIENT["Client — React SPA :3000  |  Static bundle :8080"]
-        UI["Dashboard · Generate · Conversion Runner · History · Charts · Diagrams"]
+    subgraph CLIENT["🖥  Client — React SPA :3000  |  Static bundle :8080"]
+        UI["Dashboard · Generate · Conversion Runner · History · Charts · Benchmark · Diagrams"]
     end
 
-    subgraph REST["REST API  :8080"]
+    subgraph REST["🔌  REST API  :8080"]
         RSC["POST /api/random-statements\n?loadProfile=LOW|HIGH"]
         CVC["POST /api/conversions\nbody: statementId · targetFormat · engine"]
         JHC["GET /api/conversions/jobs"]
         ACT["GET /actuator/health  /actuator/info"]
     end
 
-    subgraph DOMAIN["Domain  +  Persistence"]
+    subgraph DOMAIN["🗄  Domain  +  Persistence"]
         RND["RandomStatementService"]
         DB[("H2 In-Memory\nbank_statements\nbank_transactions")]
         BSM["BankStatementMapper\n(entity → domain record)"]
     end
 
-    subgraph BATCH["Spring Batch — statementExportJob"]
+    subgraph BATCH["⚙  Spring Batch — statementExportJob"]
         IR["BankStatementItemReader\njoin-fetch → BankStatementEntity"]
         IP["StatementExportProcessor\nmap → validate → export"]
         IW["BankingFileWriter\n→ ./output/"]
     end
 
-    subgraph VAL["3-Stage Validation"]
+    subgraph VAL["🛡  3-Stage Validation"]
         V1["① InternalStatementValidator\nIBAN · currency · balances · txns"]
         V2["② MT re-parse\nProwide Core field check"]
         V3["③ camt XSD\nISO 20022 schema check"]
     end
 
-    subgraph STRATS["Strategy Pattern  ×  8"]
+    subgraph STRATS["🔀  Strategy Pattern  ×  8"]
         direction LR
-        subgraph PW["Prowide Engine"]
+        subgraph PW["🔶  Prowide Engine"]
             P940["MT940\nField20/25/60F/61/86/62F"]
             P942["MT942\nField20/25/28C/61/86"]
             P052["camt.052\nISO 20022 XML — intraday"]
             P053["camt.053\nISO 20022 XML — end-of-day"]
         end
-        subgraph VE["Velocity Engine"]
+        subgraph VE["🟣  Velocity Engine"]
             V940["MT940  mt940.vm"]
             V942["MT942  mt942.vm"]
             V052["camt.052  camt052.vm"]
@@ -115,11 +116,11 @@ graph TB
         end
     end
 
-    subgraph OUT["Output  ./output/"]
-        O1["statement-N.mt940\ntext/plain"]
-        O2["statement-N.mt942\ntext/plain"]
-        O3["statement-N.camt052.xml\napplication/xml"]
-        O4["statement-N.camt053.xml\napplication/xml"]
+    subgraph OUT["📁  Output  ./output/"]
+        O1["statement-N.mt940\nSWIFT MT  text/plain"]
+        O2["statement-N.mt942\nSWIFT MT  text/plain"]
+        O3["statement-N.camt052.xml\nISO 20022  application/xml"]
+        O4["statement-N.camt053.xml\nISO 20022  application/xml"]
     end
 
     CLIENT --> REST
@@ -133,14 +134,51 @@ graph TB
     P052 & V052 --> O3
     P053 & V053 --> O4
     STRATS --> IW --> OUT
+
+    classDef fe       fill:#E64A19,stroke:#BF360C,color:#fff
+    classDef api      fill:#1565C0,stroke:#0D47A1,color:#fff
+    classDef batch    fill:#2E7D32,stroke:#1B5E20,color:#fff
+    classDef val      fill:#F57F17,stroke:#E65100,color:#fff
+    classDef domain   fill:#5D4037,stroke:#3E2723,color:#fff
+    classDef prowide  fill:#BF360C,stroke:#7F0000,color:#fff
+    classDef velocity fill:#7B1FA2,stroke:#4A148C,color:#fff
+    classDef mt       fill:#003087,stroke:#001A52,color:#fff
+    classDef camt     fill:#0070AD,stroke:#004E7A,color:#fff
+
+    class UI fe
+    class RSC,CVC,JHC,ACT api
+    class IR,IP,IW batch
+    class V1,V2,V3 val
+    class RND,DB,BSM domain
+    class P940,P942,P052,P053 prowide
+    class V940,V942,V052,V053 velocity
+    class O1,O2 mt
+    class O3,O4 camt
+
+    style CLIENT fill:#FFF3E0,stroke:#E64A19,stroke-width:2px
+    style REST   fill:#E3F2FD,stroke:#1565C0,stroke-width:2px
+    style DOMAIN fill:#EFEBE9,stroke:#5D4037,stroke-width:2px
+    style BATCH  fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px
+    style VAL    fill:#FFF8E1,stroke:#F57F17,stroke-width:2px
+    style STRATS fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px
+    style PW     fill:#FBE9E7,stroke:#BF360C,stroke-width:2px
+    style VE     fill:#EDE7F6,stroke:#7B1FA2,stroke-width:2px
+    style OUT    fill:#ECEFF1,stroke:#546E7A,stroke-width:2px
 ```
 
 ### Batch Pipeline
 
-```
-BankStatementItemReader  (join-fetch from H2 by statementId)
-    → StatementExportProcessor  (map entity → domain → validate → resolve strategy → export)
-    → BankingFileWriter  (write to ./output/, publish outputFile + fileContent to step context)
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#555555', 'fontSize': '14px'}}}%%
+flowchart LR
+    IR["⚙ BankStatementItemReader\njoin-fetch from H2\nby statementId"]
+    IP["⚙ StatementExportProcessor\nmap entity → domain\nvalidate → resolve strategy → export"]
+    IW["⚙ BankingFileWriter\nwrite to ./output/\npublish outputFile + fileContent"]
+
+    IR --> IP --> IW
+
+    classDef step fill:#2E7D32,stroke:#1B5E20,color:#fff
+    class IR,IP,IW step
 ```
 
 Each Spring Batch job is parameterised by `statementId`, `targetFormat`, and `engine`. A unique `runId` timestamp ensures the same statement can be re-converted in any combination without Spring Batch rejecting it as a duplicate.
