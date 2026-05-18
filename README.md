@@ -10,7 +10,7 @@
 [![Test](https://github.com/wallaceespindola/camt-mt-converters/actions/workflows/test.yml/badge.svg)](https://github.com/wallaceespindola/camt-mt-converters/actions/workflows/test.yml)
 [![CodeQL](https://github.com/wallaceespindola/camt-mt-converters/actions/workflows/codeql.yml/badge.svg)](https://github.com/wallaceespindola/camt-mt-converters/actions/workflows/codeql.yml)
 [![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://adoptium.net/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.x-6DB33F?style=flat-square&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.x-6DB33F?style=flat-square&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![Spring Batch](https://img.shields.io/badge/Spring%20Batch-5.x-6DB33F?style=flat-square&logo=spring&logoColor=white)](https://spring.io/projects/spring-batch)
 [![SWIFT MT](https://img.shields.io/badge/SWIFT-MT940%20%7C%20MT942-003087?style=flat-square&logoColor=white)](https://www.swift.com/standards/data-standards/mt)
 [![ISO 20022](https://img.shields.io/badge/ISO%2020022-camt.052%20%7C%20camt.053-0070AD?style=flat-square&logoColor=white)](https://www.iso20022.org/catalogue-messages/iso-20022-messages-archive?search=camt)
