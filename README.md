@@ -284,7 +284,8 @@ Full build + health-check launch and graceful stop — no `make` required.
 | `run.bat`    | Windows 10+ CMD  | `run.bat`  ·  `run.bat --skip-build`    |
 | `kill.bat`   | Windows 10+ CMD  | `kill.bat`                               |
 
-All scripts: build with Maven (skippable), wait for `/actuator/health` (up to 90 s), write logs to `logs/`.
+All scripts: build with Maven (skippable), wait for `/actuator/health` (up to 90 s), write logs to `logs/`.  
+PowerShell scripts (`run.ps1`, `kill.ps1`) are pure ASCII — compatible with Windows PowerShell 5.x and PowerShell Core 7+.
 
 ---
 
