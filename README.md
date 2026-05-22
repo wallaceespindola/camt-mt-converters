@@ -71,8 +71,8 @@ ISO 20022 is the global XML-based financial messaging standard mandated by the E
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#555555', 'fontSize': '14px'}}}%%
 graph TB
-    subgraph CLIENT["🖥  Client — React SPA :3000  |  Static bundle :8080"]
-        UI["Dashboard · Generate · Conversion Runner · History · Charts · Benchmark · Diagrams"]
+    subgraph CLIENT["🖥  Client — HTML/JS SPA  :8080"]
+        UI["Dashboard · Generate · Conversion Runner · History · Charts · Diagrams"]
     end
 
     subgraph REST["🔌  REST API  :8080"]
@@ -221,7 +221,6 @@ The Prowide engine uses strongly-typed Java objects (`MT940`, `Field60F`, `MxCam
 
 - Java 21+ (tested with Amazon Corretto 21 and Eclipse Temurin 21)
 - Maven 3.9+
-- Node.js 22+ and npm 10+ _(only needed to build or develop the React frontend)_
 - `make` _(optional — simplifies commands)_
 - `curl` + `jq` _(optional — for the API examples below)_
 
@@ -243,11 +242,8 @@ mvn clean install
 # Quick build (skip tests)
 make build                             # or: mvn clean package -DskipTests
 
-# Start in dev mode — Swagger UI at http://localhost:8080/swagger-ui.html
-make run                               # or: mvn spring-boot:run -Dspring-boot.run.profiles=dev
-
-# Start without dev profile (no Swagger)
-make run-prod                          # or: mvn spring-boot:run
+# Start the application
+make run                               # or: mvn spring-boot:run
 
 # Run all tests with JaCoCo coverage
 make test                              # or: mvn verify
@@ -268,57 +264,54 @@ make clean
 make help
 ```
 
-Application starts at **http://localhost:8080**  
-Swagger UI (dev profile only): **http://localhost:8080/swagger-ui.html**  
-React SPA: **http://localhost:8080** (pre-built bundle served from `src/main/resources/static/`)
+| URL | Description |
+|-----|-------------|
+| **http://localhost:8080** | Web UI (HTML/JS SPA) |
+| **http://localhost:8080/swagger-ui.html** | Swagger / OpenAPI docs |
+| **http://localhost:8080/h2-console** | H2 in-memory database console |
+| **http://localhost:8080/actuator/health** | Health endpoint |
 
 ### Cross-Platform Run / Kill Scripts
 
 Full build + health-check launch and graceful stop — no `make` required.
 
-| Script       | Platform         | Usage                                           |
-|--------------|------------------|-------------------------------------------------|
-| `run.sh`     | macOS / Linux    | `./run.sh`  ·  `./run.sh --prod`  ·  `./run.sh --skip-build` |
-| `kill.sh`    | macOS / Linux    | `./kill.sh`                                     |
-| `run.ps1`    | PowerShell Core 7+ (all platforms) | `.\run.ps1`  ·  `.\run.ps1 -Prod`  ·  `.\run.ps1 -SkipBuild` |
-| `kill.ps1`   | PowerShell Core 7+ (all platforms) | `.\kill.ps1`                         |
-| `run.bat`    | Windows 10+ CMD  | `run.bat`  ·  `run.bat --prod`                  |
-| `kill.bat`   | Windows 10+ CMD  | `kill.bat`                                      |
+| Script       | Platform         | Usage                                    |
+|--------------|------------------|------------------------------------------|
+| `run.sh`     | macOS / Linux    | `./run.sh`  ·  `./run.sh --skip-build`  |
+| `kill.sh`    | macOS / Linux    | `./kill.sh`                              |
+| `run.ps1`    | PowerShell Core 7+ (all platforms) | `.\run.ps1`  ·  `.\run.ps1 -SkipBuild` |
+| `kill.ps1`   | PowerShell Core 7+ (all platforms) | `.\kill.ps1`                 |
+| `run.bat`    | Windows 10+ CMD  | `run.bat`  ·  `run.bat --skip-build`    |
+| `kill.bat`   | Windows 10+ CMD  | `kill.bat`                               |
 
 All scripts: build with Maven (skippable), wait for `/actuator/health` (up to 90 s), write logs to `logs/`.
 
 ---
 
-## React Frontend
+## Frontend
 
-A full React 19 + MUI + Recharts single-page app is included in `src/main/frontend/`. The pre-built bundle in `src/main/resources/static/` is served directly by Spring Boot — no Node.js needed at runtime.
+A vanilla **HTML/CSS/JavaScript** single-page app served directly from `src/main/resources/static/` by Spring Boot. No Node.js, no npm, no build step required.
 
-### Frontend Views
+| File | Description |
+|------|-------------|
+| `static/index.html` | SPA shell — header, sidebar nav, main container, footer |
+| `static/css/style.css` | All styling with CSS variables for light/dark theme |
+| `static/js/app.js` | Router, view functions, API calls, chart and diagram logic |
 
-| View | Route | Description |
-|---|---|---|
-| **Dashboard** | `/` | Health status, app info, quick-action cards |
-| **Generate Statements** | `/generate` | Seed H2 with LOW or HIGH load profile; shows generated statement ID |
-| **Conversion Runner** | `/convert` | Select statement ID + format + engine; single run or all 8 combinations |
-| **History** | `/history` | Auto-refreshing table of all conversion job executions |
-| **Charts** | `/charts` | Duration charts by format and engine, timeline, status breakdown |
-| **Diagrams** | `/diagrams` | Live-rendered Mermaid architecture diagrams |
+CDN dependencies loaded at runtime (no local install):
+- **Chart.js 4.4** — bar and line charts in the Charts view
+- **Mermaid 11** — live architecture diagrams in the Diagrams view
 
-### Build or Develop the Frontend
+### Views
 
-```bash
-# Build React bundle → src/main/resources/static/ (then serve via Spring Boot)
-make build-frontend
-# or:
-cd src/main/frontend && npm install --legacy-peer-deps && npm run build
-
-# Start Vite dev server (port 3000, proxies /api + /actuator to localhost:8080)
-make dev-frontend
-# or:
-cd src/main/frontend && npm run dev
-```
-
-The Vite dev server proxies all backend calls — start Spring Boot first (`make run`), then `make dev-frontend`.
+| View | Hash | Description |
+|------|------|-------------|
+| **Dashboard** | `#dashboard` | Health status, app info, job summary, quick-action cards |
+| **Generate Statements** | `#generate` | Seed H2 with LOW or HIGH load profile; shows generated statement ID |
+| **Conversion Runner** | `#convert` | Select statement ID + format + engine; single run or all 8 combinations |
+| **History** | `#history` | Auto-refreshing table of all conversion job executions (every 15 s) |
+| **Charts** | `#charts` | Duration by format/engine, timeline, status breakdown (every 30 s) |
+| **Diagrams** | `#diagrams` | Live-rendered Mermaid architecture diagrams |
 
 ---
 
@@ -375,8 +368,7 @@ curl -s -X POST "http://localhost:8080/api/random-statements?loadProfile=HIGH" |
 | Command              | Description                                                          |
 |----------------------|----------------------------------------------------------------------|
 | `make build`         | Compile and package (skips tests)                                    |
-| `make run`           | Start in dev mode — Swagger UI at `/swagger-ui.html`                 |
-| `make run-prod`      | Start without dev profile (no Swagger)                               |
+| `make run`           | Start the application (`mvn spring-boot:run`)                        |
 | `make test`          | Run all tests with JaCoCo coverage                                   |
 | `make test-unit`     | Unit tests only                                                      |
 | `make test-integration` | Integration tests only                                            |
@@ -384,8 +376,6 @@ curl -s -X POST "http://localhost:8080/api/random-statements?loadProfile=HIGH" |
 | `make kill`          | Kill Spring Boot process (port 8080) via `pkill`                     |
 | `make run-script`    | Full build + start via `run.sh` — with health-check wait             |
 | `make kill-script`   | Stop backend via `kill.sh`                                           |
-| `make build-frontend`| npm install + Vite build → `src/main/resources/static/`             |
-| `make dev-frontend`  | Start Vite dev server on port 3000 (proxies to localhost:8080)       |
 | `make lint`          | Compiler warnings via `-Xlint:all`                                   |
 | `make docs`          | Generate JaCoCo HTML coverage report → `target/site/jacoco/`        |
 | `make help`          | Show all commands with descriptions                                  |
@@ -414,7 +404,7 @@ To add a new strategy: implement `StatementExportStrategy`, return the key from 
 ## Architecture Diagrams
 
 Architecture diagrams are in `docs/diagrams/` in both Mermaid (`.mmd`) and PlantUML (`.puml`) formats.
-They are also rendered live in the **Diagrams** view of the React SPA.
+They are also rendered live in the **Diagrams** view of the SPA (via Mermaid.js CDN).
 
 | Diagram | File |
 |---|---|
@@ -430,7 +420,7 @@ They are also rendered live in the **Diagrams** view of the React SPA.
 
 ## Swagger UI
 
-Available **only in the `dev` profile**:
+Always available — no profile flag required:
 
 ```
 http://localhost:8080/swagger-ui.html
@@ -438,10 +428,8 @@ http://localhost:8080/v3/api-docs
 ```
 
 ```bash
-make run      # or: mvn spring-boot:run -Dspring-boot.run.profiles=dev
+mvn spring-boot:run   # or: make run
 ```
-
-In any other profile `springdoc.swagger-ui.enabled` and `springdoc.api-docs.enabled` are both `false`.
 
 ---
 
@@ -516,7 +504,7 @@ output/
 | REST — statements   | `RandomStatementControllerTest`   | MockMvc, `@MockitoBean`        |
 | REST — conversions  | `StatementConversionControllerTest` | MockMvc, `@MockitoBean`      |
 | Actuator            | `ActuatorTest`                    | `TestRestTemplate`             |
-| Swagger             | `SwaggerAvailabilityTest`         | `TestRestTemplate`, `@ActiveProfiles("dev")` |
+| Swagger             | `SwaggerAvailabilityTest`         | `TestRestTemplate`                           |
 
 **45 tests, 0 failures** — `mvn verify` green, JaCoCo check passes (≥40% instruction coverage enforced).
 
@@ -531,10 +519,10 @@ mvn test -Dtest=StrategyFactoryTest    # single class
 
 ```
 camt-mt-converters/
-├── pom.xml                            Maven build (Java 21, Spring Boot 3.4.x)
-├── Makefile                           15 developer commands
+├── pom.xml                            Maven build (Java 21, Spring Boot 3.5.x)
+├── Makefile                           Developer commands
 ├── run.sh  kill.sh                    macOS / Linux start + stop scripts
-├── run.ps1 kill.ps1                   PowerShell Core (all platforms)
+├── run.ps1 kill.ps1                   PowerShell Core (all platforms, pure ASCII)
 ├── run.bat kill.bat                   Windows 10+ CMD
 ├── LICENSE                            Apache 2.0
 ├── .github/
@@ -547,7 +535,7 @@ camt-mt-converters/
 │   ├── PULL_REQUEST_TEMPLATE.md
 │   └── ISSUE_TEMPLATE/
 ├── docs/
-│   ├── PRD.md                         Product requirements v1.0 (949 lines)
+│   ├── PRD.md                         Product requirements v1.0
 │   ├── CHANGELOG.md
 │   ├── CONTRIBUTING.md
 │   ├── architecture.md
@@ -583,16 +571,12 @@ camt-mt-converters/
 │   ├── validation/                    InternalStatementValidator
 │   └── exception/                     ConversionException · JobLaunchException
 ├── src/main/resources/
-│   ├── application.yml
-│   ├── application-dev.yml
-│   ├── static/                        Pre-built React bundle (committed — served by Spring Boot)
+│   ├── application.yml                Single profile — Swagger + H2 console always on
+│   ├── static/                        Vanilla HTML/CSS/JS SPA (served by Spring Boot)
+│   │   ├── index.html
+│   │   ├── css/style.css
+│   │   └── js/app.js
 │   └── templates/                     mt940.vm · mt942.vm · camt052.vm · camt053.vm
-├── src/main/frontend/                 React 19 + MUI + Recharts + Mermaid source
-│   ├── src/api/client.ts              Axios API client + TypeScript types
-│   ├── src/views/                     DashboardView · DataGeneratorView · ConversionRunnerView
-│   │                                  ConversionHistoryView · ConversionChartsView · DiagramsView
-│   ├── package.json
-│   └── vite.config.ts                 Builds to src/main/resources/static/
 ├── src/test/java/                     11 test classes · 45 tests
 ├── logs/                              Runtime logs + PID files (gitignored content)
 └── output/                            Generated banking files (gitignored; .gitkeep preserves dir)
@@ -608,7 +592,7 @@ camt-mt-converters/
 | ISO 20022 camt Message Catalogue | https://www.iso20022.org/catalogue-messages/iso-20022-messages-archive?search=camt |
 | Prowide Core (pw-swift-core) | https://github.com/prowide/prowide-core |
 | Prowide ISO 20022 (pw-iso20022) | https://github.com/prowide/prowide-iso20022 |
-| Apache Velocity Engine 2.3 | https://velocity.apache.org/engine/2.3/ |
+| Apache Velocity Engine 2.4 | https://velocity.apache.org/engine/2.4/ |
 | Spring Batch Reference | https://docs.spring.io/spring-batch/docs/current/reference/html/ |
 
 ---
