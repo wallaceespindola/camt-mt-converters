@@ -1,4 +1,4 @@
-# kill.ps1 — Stop the Banking Statement Converter backend (port 8080)
+# kill.ps1 - Stop the Banking Statement Converter backend (port 8080)
 # Platforms: macOS, Ubuntu/Debian Linux, Windows 10+  (requires PowerShell Core 7+ on Mac/Linux)
 # Usage:  .\kill.ps1   or   pwsh ./kill.ps1
 
@@ -6,7 +6,7 @@ param(
     [int[]]$Ports = @(8080)
 )
 
-# ── PS 5.x / Windows PowerShell compat shim ──────────────────────────────────
+# -- PS 5.x / Windows PowerShell compat shim ----------------------------------
 if ($null -eq (Get-Variable 'IsWindows' -ErrorAction SilentlyContinue)) {
     $IsWindows = $true; $IsMacOS = $false; $IsLinux = $false
 }
@@ -67,7 +67,7 @@ Write-Host ""
 
 $killed = 0
 
-# ── 1. PID-file kill ─────────────────────────────────────────────────────────
+# -- 1. PID-file kill ---------------------------------------------------------
 if (Test-Path $PidFile) {
     $pid = [int]((Get-Content $PidFile -Raw).Trim())
     $proc = Get-Process -Id $pid -ErrorAction SilentlyContinue
@@ -82,7 +82,7 @@ if (Test-Path $PidFile) {
     Remove-Item $PidFile -Force -ErrorAction SilentlyContinue
 }
 
-# ── 2. Pattern-based kill (safety net) ───────────────────────────────────────
+# -- 2. Pattern-based kill (safety net) ---------------------------------------
 if ($IsWindows) {
     $procs = Get-Process -Name "java" -ErrorAction SilentlyContinue |
              Where-Object { $_.MainWindowTitle -match 'Banking' -or $true }
@@ -98,7 +98,7 @@ if ($IsWindows) {
     if ($result2 -eq "0") { Write-Ok "Stopped spring-boot:run"; $killed++ }
 }
 
-# ── 3. Port-based kill (final safety net) ────────────────────────────────────
+# -- 3. Port-based kill (final safety net) ------------------------------------
 foreach ($port in $Ports) {
     $pids = Get-PortPIDs $port
     if ($pids) {
@@ -110,8 +110,8 @@ foreach ($port in $Ports) {
 
 Write-Host ""
 if ($killed -gt 0) {
-    Write-Ok "Done — $killed process group(s) stopped."
+    Write-Ok "Done - $killed process group(s) stopped."
 } else {
-    Write-Warn "No matching processes found — nothing to kill."
+    Write-Warn "No matching processes found - nothing to kill."
 }
 Write-Host ""

@@ -1,8 +1,8 @@
-# run.ps1 — Build and start the Banking Statement Converter backend (port 8080)
+# run.ps1 - Build and start the Banking Statement Converter backend (port 8080)
 # Platforms: macOS, Ubuntu/Debian Linux, Windows 10+  (requires PowerShell Core 7+ on Mac/Linux)
 # Usage:
-#   .\run.ps1              — build and start (Swagger at /swagger-ui.html, H2 at /h2-console)
-#   .\run.ps1 -SkipBuild   — skip Maven build, start from existing classes
+#   .\run.ps1              - build and start (Swagger at /swagger-ui.html, H2 at /h2-console)
+#   .\run.ps1 -SkipBuild   - skip Maven build, start from existing classes
 
 param(
     [switch]$SkipBuild,
@@ -11,7 +11,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# ── PS 5.x / Windows PowerShell compat shim ──────────────────────────────────
+# -- PS 5.x / Windows PowerShell compat shim ----------------------------------
 if ($null -eq (Get-Variable 'IsWindows' -ErrorAction SilentlyContinue)) {
     $IsWindows = $true; $IsMacOS = $false; $IsLinux = $false
 }
@@ -25,7 +25,7 @@ $PidFile     = Join-Path $LogDir "backend.pid"
 $BackendPort = 8080
 $HealthUrl   = "http://localhost:$BackendPort/actuator/health"
 
-# ── helpers ───────────────────────────────────────────────────────────────────
+# -- helpers -------------------------------------------------------------------
 function Write-Info { param($m) Write-Host "[INFO]  $m" -ForegroundColor Cyan }
 function Write-Ok   { param($m) Write-Host "[OK]    $m" -ForegroundColor Green }
 function Write-Warn { param($m) Write-Host "[WARN]  $m" -ForegroundColor Yellow }
@@ -63,20 +63,20 @@ function Wait-ForBackend {
         } catch {}
         Start-Sleep -Seconds 1
     }
-    Write-Err "Backend did not start within ${WaitSecs}s — check $BackendLog"
+    Write-Err "Backend did not start within ${WaitSecs}s - check $BackendLog"
     exit 1
 }
 
-# ── banner ────────────────────────────────────────────────────────────────────
+# -- banner --------------------------------------------------------------------
 $platform = if ($IsWindows) { "Windows" } elseif ($IsMacOS) { "macOS" } else { "Linux" }
 Write-Host ""
-Write-Host "════════════════════════════════════════════════════════════════" -ForegroundColor Magenta
-Write-Host "  Banking Statement Converter — Backend Launcher" -ForegroundColor Magenta
+Write-Host "================================================================" -ForegroundColor Magenta
+Write-Host "  Banking Statement Converter - Backend Launcher" -ForegroundColor Magenta
 Write-Host "  Platform : $($platform)" -ForegroundColor Magenta
-Write-Host "════════════════════════════════════════════════════════════════" -ForegroundColor Magenta
+Write-Host "================================================================" -ForegroundColor Magenta
 Write-Host ""
 
-# ── pre-flight ────────────────────────────────────────────────────────────────
+# -- pre-flight ----------------------------------------------------------------
 foreach ($cmd in @("java", "mvn")) {
     if (-not (Get-Command $cmd -ErrorAction SilentlyContinue)) {
         Write-Err "Required command not found: $cmd"
@@ -85,13 +85,13 @@ foreach ($cmd in @("java", "mvn")) {
 }
 
 if (Test-PortInUse $BackendPort) {
-    Write-Warn "Port $BackendPort already in use — run kill.ps1 first."
+    Write-Warn "Port $BackendPort already in use - run kill.ps1 first."
     exit 1
 }
 
 New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 
-# ── 1. Maven build ────────────────────────────────────────────────────────────
+# -- 1. Maven build ------------------------------------------------------------
 if (-not $SkipBuild) {
     Write-Info "Building project (skipping tests)..."
     Set-Location $ScriptDir
@@ -100,7 +100,7 @@ if (-not $SkipBuild) {
     $buildLines | Where-Object { $_ -match '(BUILD|ERROR|\[ERROR\])' } | ForEach-Object { Write-Host $_ }
 
     if (-not ($buildLines | Where-Object { $_ -match 'BUILD SUCCESS' })) {
-        Write-Err "Maven build failed — see $BuildLog"
+        Write-Err "Maven build failed - see $BuildLog"
         exit 1
     }
     Write-Ok "Build complete"
@@ -108,7 +108,7 @@ if (-not $SkipBuild) {
     Write-Info "Skipping build (-SkipBuild)"
 }
 
-# ── 2. Start backend ──────────────────────────────────────────────────────────
+# -- 2. Start backend ----------------------------------------------------------
 Write-Info "Starting Spring Boot backend (port: $BackendPort)..."
 Set-Location $ScriptDir
 
@@ -117,19 +117,19 @@ $proc = Start-BackgroundProcess -Command "mvn spring-boot:run" -WorkDir $ScriptD
 $proc.Id | Out-File -FilePath $PidFile -Encoding ascii -NoNewline
 Write-Info "Backend PID: $($proc.Id)  (log: $BackendLog)"
 
-# ── wait for health ───────────────────────────────────────────────────────────
+# -- wait for health -----------------------------------------------------------
 Wait-ForBackend
 
-# ── summary ───────────────────────────────────────────────────────────────────
+# -- summary -------------------------------------------------------------------
 Write-Host ""
-Write-Host "╔══════════════════════════════════════════════════════════════╗" -ForegroundColor Green
-Write-Host "║  Backend is running                                          ║" -ForegroundColor Green
-Write-Host "║  UI        ->  http://localhost:8080/                        ║" -ForegroundColor Green
-Write-Host "║  API       ->  http://localhost:8080/api                     ║" -ForegroundColor Green
-Write-Host "║  Swagger   ->  http://localhost:8080/swagger-ui.html         ║" -ForegroundColor Green
-Write-Host "║  H2 DB     ->  http://localhost:8080/h2-console              ║" -ForegroundColor Green
-Write-Host "║  Health    ->  http://localhost:8080/actuator/health         ║" -ForegroundColor Green
-Write-Host "║                                                              ║" -ForegroundColor Green
-Write-Host "║  Stop:  .\kill.ps1                                           ║" -ForegroundColor Green
-Write-Host "╚══════════════════════════════════════════════════════════════╝" -ForegroundColor Green
+Write-Host "+--------------------------------------------------------------+" -ForegroundColor Green
+Write-Host "|  Backend is running                                          |" -ForegroundColor Green
+Write-Host "|  UI        ->  http://localhost:8080/                        |" -ForegroundColor Green
+Write-Host "|  API       ->  http://localhost:8080/api                     |" -ForegroundColor Green
+Write-Host "|  Swagger   ->  http://localhost:8080/swagger-ui.html         |" -ForegroundColor Green
+Write-Host "|  H2 DB     ->  http://localhost:8080/h2-console              |" -ForegroundColor Green
+Write-Host "|  Health    ->  http://localhost:8080/actuator/health         |" -ForegroundColor Green
+Write-Host "|                                                              |" -ForegroundColor Green
+Write-Host "|  Stop:  .\kill.ps1                                           |" -ForegroundColor Green
+Write-Host "+--------------------------------------------------------------+" -ForegroundColor Green
 Write-Host ""
