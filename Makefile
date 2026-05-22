@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := help
 SKIP_TESTS := -DskipTests
 
-.PHONY: help build run run-prod test test-unit test-integration clean kill lint docs run-script kill-script build-frontend dev-frontend
+.PHONY: help build run test test-unit test-integration clean kill lint docs run-script kill-script
 
 help: ## Display all available make commands with descriptions
 	@echo ""
@@ -14,10 +14,7 @@ help: ## Display all available make commands with descriptions
 build: ## Compile and package the project (skips tests)
 	mvn clean package $(SKIP_TESTS)
 
-run: ## Start the application in dev mode (Swagger UI enabled at /swagger-ui.html)
-	mvn spring-boot:run -Dspring-boot.run.profiles=dev
-
-run-prod: ## Start the application without dev profile (no Swagger)
+run: ## Start the application (Swagger at /swagger-ui.html, H2 at /h2-console)
 	mvn spring-boot:run
 
 test: ## Run all test categories with JaCoCo coverage
@@ -51,9 +48,3 @@ run-script: ## Build and start via run.sh (macOS/Linux) — foreground with heal
 
 kill-script: ## Stop the backend via kill.sh (macOS/Linux)
 	bash kill.sh
-
-build-frontend: ## Install npm deps and build React frontend → src/main/resources/static/
-	cd src/main/frontend && npm install --legacy-peer-deps && npm run build
-
-dev-frontend: ## Start Vite dev server on port 3000 (proxies API to localhost:8080)
-	cd src/main/frontend && npm run dev

@@ -1,12 +1,10 @@
 # run.ps1 — Build and start the Banking Statement Converter backend (port 8080)
 # Platforms: macOS, Ubuntu/Debian Linux, Windows 10+  (requires PowerShell Core 7+ on Mac/Linux)
 # Usage:
-#   .\run.ps1              — dev mode (Swagger UI at /swagger-ui.html)
-#   .\run.ps1 -Prod        — production mode (no Swagger)
+#   .\run.ps1              — build and start (Swagger at /swagger-ui.html, H2 at /h2-console)
 #   .\run.ps1 -SkipBuild   — skip Maven build, start from existing classes
 
 param(
-    [switch]$Prod,
     [switch]$SkipBuild,
     [int]$WaitSecs = 90
 )
@@ -26,7 +24,6 @@ $BuildLog    = Join-Path $LogDir "build.log"
 $PidFile     = Join-Path $LogDir "backend.pid"
 $BackendPort = 8080
 $HealthUrl   = "http://localhost:$BackendPort/actuator/health"
-$Profile     = if ($Prod) { "prod" } else { "dev" }
 
 # ── helpers ───────────────────────────────────────────────────────────────────
 function Write-Info { param($m) Write-Host "[INFO]  $m" -ForegroundColor Cyan }
@@ -76,7 +73,6 @@ Write-Host ""
 Write-Host "╔══════════════════════════════════════════════════════════════╗" -ForegroundColor Magenta
 Write-Host "║       Banking Statement Converter — Backend Launcher         ║" -ForegroundColor Magenta
 Write-Host "║  Platform : $($platform.PadRight(49))║" -ForegroundColor Magenta
-Write-Host "║  Profile  : $($Profile.PadRight(49))║" -ForegroundColor Magenta
 Write-Host "╚══════════════════════════════════════════════════════════════╝" -ForegroundColor Magenta
 Write-Host ""
 
@@ -113,15 +109,10 @@ if (-not $SkipBuild) {
 }
 
 # ── 2. Start backend ──────────────────────────────────────────────────────────
-Write-Info "Starting Spring Boot backend (profile: $Profile, port: $BackendPort)..."
+Write-Info "Starting Spring Boot backend (port: $BackendPort)..."
 Set-Location $ScriptDir
 
-$mvnArgs = "spring-boot:run"
-if ($Profile -eq "dev") {
-    $mvnArgs += " -Dspring-boot.run.profiles=dev"
-}
-
-$proc = Start-BackgroundProcess -Command "mvn $mvnArgs" -WorkDir $ScriptDir `
+$proc = Start-BackgroundProcess -Command "mvn spring-boot:run" -WorkDir $ScriptDir `
                                 -OutLog $BackendLog -ErrLog $BackendErr
 $proc.Id | Out-File -FilePath $PidFile -Encoding ascii -NoNewline
 Write-Info "Backend PID: $($proc.Id)  (log: $BackendLog)"
@@ -133,12 +124,11 @@ Wait-ForBackend
 Write-Host ""
 Write-Host "╔══════════════════════════════════════════════════════════════╗" -ForegroundColor Green
 Write-Host "║  Backend is running                                          ║" -ForegroundColor Green
+Write-Host "║  UI        ->  http://localhost:8080/                        ║" -ForegroundColor Green
 Write-Host "║  API       ->  http://localhost:8080/api                     ║" -ForegroundColor Green
-Write-Host "║  Health    ->  http://localhost:8080/actuator/health         ║" -ForegroundColor Green
-if ($Profile -eq "dev") {
 Write-Host "║  Swagger   ->  http://localhost:8080/swagger-ui.html         ║" -ForegroundColor Green
 Write-Host "║  H2 DB     ->  http://localhost:8080/h2-console              ║" -ForegroundColor Green
-}
+Write-Host "║  Health    ->  http://localhost:8080/actuator/health         ║" -ForegroundColor Green
 Write-Host "║                                                              ║" -ForegroundColor Green
 Write-Host "║  Stop:  .\kill.ps1                                           ║" -ForegroundColor Green
 Write-Host "╚══════════════════════════════════════════════════════════════╝" -ForegroundColor Green

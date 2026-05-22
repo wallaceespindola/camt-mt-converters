@@ -2,9 +2,8 @@
 REM run.bat — Build and start the Banking Statement Converter backend (port 8080)
 REM Platform: Windows 10+  (CMD)
 REM Usage:
-REM   run.bat           — dev mode (Swagger UI at /swagger-ui.html)
-REM   run.bat --prod    — production mode (no Swagger)
-REM   run.bat --skip-build  — skip Maven build
+REM   run.bat              — build and start (Swagger at /swagger-ui.html, H2 at /h2-console)
+REM   run.bat --skip-build — skip Maven build
 
 setlocal EnableDelayedExpansion
 
@@ -15,12 +14,10 @@ set "BUILD_LOG=%LOG_DIR%\build.log"
 set "BACKEND_PORT=8080"
 set "HEALTH_URL=http://localhost:%BACKEND_PORT%/actuator/health"
 set "WAIT_SECS=90"
-set "SPRING_PROFILE=dev"
 set "SKIP_BUILD=false"
 
 REM ── parse args ────────────────────────────────────────────────────────────────
 for %%a in (%*) do (
-    if "%%a"=="--prod"        set "SPRING_PROFILE=prod"
     if "%%a"=="--skip-build"  set "SKIP_BUILD=true"
 )
 
@@ -28,7 +25,6 @@ echo.
 echo ============================================================
 echo   Banking Statement Converter - Backend Launcher
 echo   Platform : Windows
-echo   Profile  : %SPRING_PROFILE%
 echo ============================================================
 echo.
 
@@ -62,15 +58,9 @@ if "%SKIP_BUILD%"=="false" (
 )
 
 REM ── 2. Start backend in a new window ─────────────────────────────────────────
-echo [INFO]  Starting Spring Boot backend ^(profile: %SPRING_PROFILE%, port: %BACKEND_PORT%^)...
+echo [INFO]  Starting Spring Boot backend ^(port: %BACKEND_PORT%^)...
 cd /d "%SCRIPT_DIR%"
-
-if "%SPRING_PROFILE%"=="dev" (
-    start "BankingConverter-Backend" cmd /c "mvn spring-boot:run -Dspring-boot.run.profiles=dev > ^"%BACKEND_LOG%^" 2>&1"
-) else (
-    start "BankingConverter-Backend" cmd /c "mvn spring-boot:run > ^"%BACKEND_LOG%^" 2>&1"
-)
-
+start "BankingConverter-Backend" cmd /c "mvn spring-boot:run > ^"%BACKEND_LOG%^" 2>&1"
 echo [INFO]  Backend starting in a new window... ^(log: %BACKEND_LOG%^)
 
 REM ── wait for health ───────────────────────────────────────────────────────────
@@ -97,12 +87,11 @@ REM ── summary ────────────────────�
 echo.
 echo ============================================================
 echo   Backend is running
+echo   UI        -^>  http://localhost:8080/
 echo   API       -^>  http://localhost:8080/api
-echo   Health    -^>  http://localhost:8080/actuator/health
-if "%SPRING_PROFILE%"=="dev" (
 echo   Swagger   -^>  http://localhost:8080/swagger-ui.html
 echo   H2 DB     -^>  http://localhost:8080/h2-console
-)
+echo   Health    -^>  http://localhost:8080/actuator/health
 echo.
 echo   Stop:  kill.bat
 echo ============================================================

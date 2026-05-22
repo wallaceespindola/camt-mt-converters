@@ -1,14 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Banking Statement Converter Platform — CAMT / MT format conversion via Spring Batch" />
-    <title>Banking Statement Converter Platform</title>
-    <script type="module" crossorigin src="/assets/index-lX0Lntsx.js"></script>
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banking Statement Converter</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="brand">🏦 Banking Statement Converter</div>
+  <button id="theme-btn" class="icon-btn" title="Toggle theme">🌙</button>
+</header>
+
+<div class="layout">
+  <nav>
+    <a data-view="dashboard">📊 Dashboard</a>
+    <a data-view="generate">➕ Generate</a>
+    <a data-view="convert">▶ Conversion Runner</a>
+    <a data-view="history">📋 History</a>
+    <a data-view="charts">📈 Charts</a>
+    <a data-view="diagrams">🔀 Diagrams</a>
+  </nav>
+  <main id="main"></main>
+</div>
+
+<footer>
+  <span>By <a href="https://www.linkedin.com/in/wallaceespindola/" target="_blank">Wallace Espindola</a>
+    · Banking Statement Converter v1.0.0 · Spring Batch + CAMT/MT</span>
+  <span>
+    <a href="https://github.com/wallaceespindola/" target="_blank">GitHub</a> ·
+    <a href="https://www.linkedin.com/in/wallaceespindola/" target="_blank">LinkedIn</a>
+  </span>
+</footer>
+
+<script src="/js/app.js"></script>
+</body>
 </html>

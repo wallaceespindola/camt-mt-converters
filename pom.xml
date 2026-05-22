@@ -232,10 +232,4 @@
         </plugins>
     </build>
 
-    <profiles>
-        <!-- Allows `mvn ... -Pskip-frontend` without error, for parity with sibling projects -->
-        <profile>
-            <id>skip-frontend</id>
-        </profile>
-    </profiles>
 </project>

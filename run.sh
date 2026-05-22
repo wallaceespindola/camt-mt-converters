@@ -2,9 +2,8 @@
 # run.sh — Build and start the Banking Statement Converter backend (port 8080)
 # Platforms: macOS, Ubuntu/Debian Linux
 # Usage:
-#   ./run.sh              — dev mode (Swagger UI at /swagger-ui.html)
-#   ./run.sh --prod       — production mode (no Swagger)
-#   ./run.sh --skip-build — skip Maven build, start existing JAR/run
+#   ./run.sh              — build and start (Swagger at /swagger-ui.html, H2 at /h2-console)
+#   ./run.sh --skip-build — skip Maven build, start from existing classes
 
 set -euo pipefail
 
@@ -17,13 +16,11 @@ PID_FILE="$LOG_DIR/backend.pid"
 BACKEND_PORT=8080
 HEALTH_URL="http://localhost:${BACKEND_PORT}/actuator/health"
 WAIT_SECS=90
-PROFILE="dev"
 SKIP_BUILD=false
 
 # ── parse args ────────────────────────────────────────────────────────────────
 for arg in "$@"; do
   case "$arg" in
-    --prod)       PROFILE="prod" ;;
     --skip-build) SKIP_BUILD=true ;;
   esac
 done
@@ -59,7 +56,6 @@ echo ""
 echo "╔══════════════════════════════════════════════════════════════╗"
 echo "║       Banking Statement Converter — Backend Launcher         ║"
 echo "║  Platform : $OS                                              ║"
-echo "║  Profile  : $PROFILE                                        ║"
 echo "╚══════════════════════════════════════════════════════════════╝"
 echo ""
 
@@ -93,16 +89,10 @@ else
 fi
 
 # ── 2. Start backend ──────────────────────────────────────────────────────────
-info "Starting Spring Boot backend (profile: ${PROFILE}, port: ${BACKEND_PORT})..."
+info "Starting Spring Boot backend (port: ${BACKEND_PORT})..."
 cd "$SCRIPT_DIR"
 
-if [ "$PROFILE" = "dev" ]; then
-  SPRING_OPTS="-Dspring-boot.run.profiles=dev"
-else
-  SPRING_OPTS=""
-fi
-
-nohup mvn spring-boot:run $SPRING_OPTS \
+nohup mvn spring-boot:run \
   >"$BACKEND_LOG" 2>"$BACKEND_ERR" &
 BACKEND_PID=$!
 echo "$BACKEND_PID" > "$PID_FILE"
@@ -130,12 +120,11 @@ done
 echo ""
 echo "╔══════════════════════════════════════════════════════════════╗"
 echo "║  Backend is running                                          ║"
+echo "║  UI        →  http://localhost:8080/                         ║"
 echo "║  API       →  http://localhost:8080/api                      ║"
-echo "║  Health    →  http://localhost:8080/actuator/health          ║"
-if [ "$PROFILE" = "dev" ]; then
 echo "║  Swagger   →  http://localhost:8080/swagger-ui.html          ║"
 echo "║  H2 DB     →  http://localhost:8080/h2-console               ║"
-fi
+echo "║  Health    →  http://localhost:8080/actuator/health          ║"
 echo "║                                                              ║"
 echo "║  Stop:  ./kill.sh                                            ║"
 echo "╚══════════════════════════════════════════════════════════════╝"
