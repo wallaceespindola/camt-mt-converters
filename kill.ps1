@@ -69,15 +69,15 @@ $killed = 0
 
 # -- 1. PID-file kill ---------------------------------------------------------
 if (Test-Path $PidFile) {
-    $pid = [int]((Get-Content $PidFile -Raw).Trim())
-    $proc = Get-Process -Id $pid -ErrorAction SilentlyContinue
+    $savedPid = [int]((Get-Content $PidFile -Raw).Trim())
+    $proc = Get-Process -Id $savedPid -ErrorAction SilentlyContinue
     if ($proc) {
-        if ($IsWindows) { Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue }
-        else { & kill -9 $pid 2>/dev/null }
-        Write-Ok "Stopped backend from PID file (PID $pid)"
+        if ($IsWindows) { Stop-Process -Id $savedPid -Force -ErrorAction SilentlyContinue }
+        else { & kill -9 $savedPid 2>/dev/null }
+        Write-Ok "Stopped backend from PID file (PID $savedPid)"
         $killed++
     } else {
-        Write-Warn "PID $pid from file not running"
+        Write-Warn "PID $savedPid from file not running"
     }
     Remove-Item $PidFile -Force -ErrorAction SilentlyContinue
 }
