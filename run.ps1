@@ -70,10 +70,10 @@ function Wait-ForBackend {
 # ── banner ────────────────────────────────────────────────────────────────────
 $platform = if ($IsWindows) { "Windows" } elseif ($IsMacOS) { "macOS" } else { "Linux" }
 Write-Host ""
-Write-Host "╔══════════════════════════════════════════════════════════════╗" -ForegroundColor Magenta
-Write-Host "║       Banking Statement Converter — Backend Launcher         ║" -ForegroundColor Magenta
-Write-Host "║  Platform : $($platform.PadRight(49))║" -ForegroundColor Magenta
-Write-Host "╚══════════════════════════════════════════════════════════════╝" -ForegroundColor Magenta
+Write-Host "════════════════════════════════════════════════════════════════" -ForegroundColor Magenta
+Write-Host "  Banking Statement Converter — Backend Launcher" -ForegroundColor Magenta
+Write-Host "  Platform : $($platform)" -ForegroundColor Magenta
+Write-Host "════════════════════════════════════════════════════════════════" -ForegroundColor Magenta
 Write-Host ""
 
 # ── pre-flight ────────────────────────────────────────────────────────────────
