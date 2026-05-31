@@ -17,7 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **4 Apache Velocity strategies**: MT940, MT942, camt.052, camt.053 with `.vm` templates
 - Spring Batch pipeline: `BankStatementItemReader` → `StatementExportProcessor` → `BankingFileWriter`
 - REST API: `POST /api/random-statements`, `POST /api/conversions`, `GET /api/conversions/jobs`, `GET /api/conversions/jobs/{jobId}`
-- `RandomStatementService` with LOW (1 stmt, 10 txns) and HIGH (10 stmts, 100 txns) load profiles
+- `RandomStatementService` with LOW (10 accounts · 5 stmts · 100 txns), MEDIUM (100 accounts · 50 stmts · 1 000 txns), and HIGH (1 000 accounts · 500 stmts · 10 000 txns) load profiles
 - `BankStatementMapper`, `InternalStatementValidator`, `VelocityRenderer`
 - 3-stage validation chain (internal model → MT re-parse → camt XSD)
 - Spring Actuator `/actuator/health` (H2 + custom version indicator) and `/actuator/info`

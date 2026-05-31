@@ -10,7 +10,7 @@ skinparam sequence {
   ParticipantBorderColor #E64A19
 }
 
-participant "React Frontend" as FE
+participant "HTML/JS SPA" as FE
 participant "RandomStatementController" as RS
 participant "RandomStatementService" as SVC
 participant "StatementConversionController" as CV
@@ -29,7 +29,7 @@ FE -> RS: POST /api/random-statements?loadProfile=LOW
 RS -> SVC: generate(LOW)
 SVC -> DB: save BankStatementEntity + BankTransactionEntities
 SVC --> RS: GenerationResult
-RS --> FE: {firstStatementId, statementsGenerated, transactionsGenerated}
+RS --> FE: {firstStatementId, accountsGenerated, statementsGenerated, transactionsGenerated}
 
 note over FE,FS: Step 2 — Launch Spring Batch conversion job
 

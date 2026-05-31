@@ -190,7 +190,7 @@ All format structures shall be derived from:
   - `BankTransaction` records with booking date, value date, amount, debit/credit indicator, references, and remittance information
 
 ### FR-002a
-- [ ] `POST /api/random-statements` shall accept an optional `loadProfile` query parameter with values `LOW` (default) and `HIGH`. The `LOW` profile generates 1 statement with 10 transactions. The `HIGH` profile generates 10 statements with 100 transactions each. The profile is implemented via a `LoadProfile` enum in `com.wtechitsolutions.bankingconverter.domain`. The frontend shall expose both options as "Low Load" and "High Load" buttons.
+- [ ] `POST /api/random-statements` shall accept an optional `loadProfile` query parameter with values `LOW` (default), `MEDIUM`, and `HIGH`. `LOW`: 10 accounts · 5 statements · 100 transactions. `MEDIUM`: 100 accounts · 50 statements · 1 000 transactions. `HIGH`: 1 000 accounts · 500 statements · 10 000 transactions. All profiles use 20 transactions per statement. The profile is implemented via a `LoadProfile` enum in `com.wtechitsolutions.bankingconverter.domain`. The frontend shall expose all three options as "Low Load", "Medium Load", and "High Load" buttons.
 
 ### FR-003
 - [ ] All generated domain data shall be persisted to the H2 in-memory database.
@@ -200,11 +200,10 @@ All format structures shall be derived from:
 
 ```json
 {
-  "statementId": 1,
-  "statementReference": "STMT-20260514-001",
-  "accountIban": "DE89370400440532013000",
-  "statementsGenerated": 1,
-  "transactionsGenerated": 10,
+  "firstStatementId": 1,
+  "statementsGenerated": 5,
+  "transactionsGenerated": 100,
+  "accountsGenerated": 10,
   "timestamp": "2026-05-14T10:00:00Z"
 }
 ```
@@ -267,7 +266,7 @@ All format structures shall be derived from:
 
 | ID | Method | Endpoint | Description |
 |---|---|---|---|
-| FR-018 | POST | `/api/random-statements` | Generate and persist banking domain data; optional `?loadProfile=LOW\|HIGH` |
+| FR-018 | POST | `/api/random-statements` | Generate and persist banking domain data; optional `?loadProfile=LOW\|MEDIUM\|HIGH` |
 | FR-019 | POST | `/api/conversions` | Trigger a Spring Batch conversion job; body: `{statementId, targetFormat, engine}` |
 | FR-020 | GET | `/api/conversions/jobs` | Retrieve conversion job execution history |
 | FR-021 | GET | `/api/conversions/jobs/{jobId}` | Retrieve status and details for a specific job |
@@ -483,7 +482,7 @@ statement-{statementId}.camt053.xml
 - [ ] File generation for a single statement with up to 1,000 transactions shall complete in under 5 seconds.
 
 ### NFR-002
-- [ ] The HIGH load profile (10 statements × 100 transactions) shall complete all conversions within 60 seconds.
+- [ ] The HIGH load profile (500 statements × 20 transactions) shall complete all conversions within 60 seconds.
 
 ### NFR-003
 - [ ] The system shall report job-level timing (start, end, duration) for all batch executions.

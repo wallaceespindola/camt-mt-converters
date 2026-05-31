@@ -1,7 +1,7 @@
 %%{init: {'theme': 'base', 'themeVariables': {'actorBkg': '#1565C0', 'actorBorder': '#0D47A1', 'actorTextColor': '#fff', 'actorLineColor': '#555', 'noteBkgColor': '#FFF3E0', 'noteTextColor': '#BF360C', 'noteBorderColor': '#E64A19', 'activationBorderColor': '#E64A19', 'activationBkgColor': '#FFF3E0', 'signalColor': '#333', 'signalTextColor': '#333'}}}%%
 sequenceDiagram
     box rgb(255,243,224) Client
-        participant FE as React Frontend
+        participant FE as HTML/JS SPA
     end
     box rgb(227,242,253) REST API
         participant RS as RandomStatementController
@@ -29,7 +29,7 @@ sequenceDiagram
         RS->>SVC: generate(LOW)
         SVC->>DB: save BankStatementEntity + BankTransactionEntities
         SVC-->>RS: GenerationResult
-        RS-->>FE: firstStatementId · statementsGenerated · transactionsGenerated
+        RS-->>FE: firstStatementId · accountsGenerated · statementsGenerated · transactionsGenerated
     end
 
     rect rgb(232,245,233)

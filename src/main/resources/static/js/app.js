@@ -140,28 +140,28 @@ function generate() {
     <div class="g3" style="margin-bottom:16px">
       <div class="card">
         <b>⚡ Low Load</b><hr>
-        <p>1 statement · 10 transactions</p>
+        <p>10 accounts · 100 transactions · 5 statements</p>
         <button class="btn full" id="btn-low" onclick="doGenerate('LOW')" style="margin-top:12px">▶ Generate Low</button>
       </div>
       <div class="card">
-        <b>🚀 High Load</b><hr>
-        <p>10 statements · 100 transactions</p>
-        <button class="btn full" id="btn-high" onclick="doGenerate('HIGH')" style="margin-top:12px">🚀 Generate High</button>
+        <b>🚀 Medium Load</b><hr>
+        <p>100 accounts · 1 000 transactions · 50 statements</p>
+        <button class="btn full" id="btn-medium" onclick="doGenerate('MEDIUM')" style="margin-top:12px">🚀 Generate Medium</button>
       </div>
       <div class="card">
-        <b>🔥 Extreme Load</b><hr>
-        <p>100 statements · 1000 transactions</p>
-        <button class="btn full" id="btn-extreme" onclick="doGenerate('EXTREME')" style="margin-top:12px">🔥 Generate Extreme</button>
+        <b>🔥 High Load</b><hr>
+        <p>1 000 accounts · 10 000 transactions · 500 statements</p>
+        <button class="btn full" id="btn-high" onclick="doGenerate('HIGH')" style="margin-top:12px">🔥 Generate High</button>
       </div>
     </div>
     <div id="gen-result"></div>
   `);
 }
 
-const PROFILE_LABELS = { LOW: '▶ Generate Low', HIGH: '🚀 Generate High', EXTREME: '🔥 Generate Extreme' };
+const PROFILE_LABELS = { LOW: '▶ Generate Low', MEDIUM: '🚀 Generate Medium', HIGH: '🔥 Generate High' };
 
 async function doGenerate(profile) {
-  const allBtns = ['low', 'high', 'extreme'].map(p => $('btn-' + p)).filter(Boolean);
+  const allBtns = ['low', 'medium', 'high'].map(p => $('btn-' + p)).filter(Boolean);
   allBtns.forEach(b => { b.disabled = true; });
   const btn = $('btn-' + profile.toLowerCase());
   btn.textContent = 'Generating…';
@@ -172,9 +172,12 @@ async function doGenerate(profile) {
     $('gen-result').innerHTML = `
       <div class="card success-border">
         <b class="green">✓ Generated successfully</b><hr>
-        <div class="g3" style="margin:12px 0">
+        <div class="g4" style="margin:12px 0">
           <div class="card" style="text-align:center">
             <div class="big">${esc(r.firstStatementId)}</div><div class="muted sm">First Statement ID</div>
+          </div>
+          <div class="card" style="text-align:center">
+            <div class="big">${esc(r.accountsGenerated)}</div><div class="muted sm">Accounts</div>
           </div>
           <div class="card" style="text-align:center">
             <div class="big">${esc(r.statementsGenerated)}</div><div class="muted sm">Statements</div>
@@ -674,7 +677,7 @@ const DIAGRAMS = [
   Note over FE,DB: Phase 1 — Generate
   FE->>API: POST /api/random-statements?loadProfile=LOW
   API->>DB: save BankStatementEntity
-  API-->>FE: firstStatementId
+  API-->>FE: firstStatementId · accountsGenerated · statementsGenerated · transactionsGenerated
   Note over FE,FS: Phase 2 — Convert
   FE->>API: POST /api/conversions {statementId, format, engine}
   API->>Batch: launch job

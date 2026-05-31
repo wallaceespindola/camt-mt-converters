@@ -40,15 +40,19 @@ public class RandomStatementController {
     /**
      * Generates and persists random banking statement data using the specified load profile.
      *
-     * @param loadProfile {@code LOW} (1 statement, 10 transactions) or
-     *                    {@code HIGH} (10 statements, 100 transactions each); defaults to {@code LOW}
+     * @param loadProfile {@code LOW} (10 accounts, 5 statements, 100 transactions),
+     *                    {@code MEDIUM} (100 accounts, 50 statements, 1 000 transactions), or
+     *                    {@code HIGH} (1 000 accounts, 500 statements, 10 000 transactions);
+     *                    defaults to {@code LOW}
      * @return a {@link RandomStatementResponse} containing generation counts and the first statement ID
      */
     @PostMapping
     @Operation(
             summary = "Generate random banking statement data",
             description = "Generates random BankStatement + BankTransaction records and persists them to H2. "
-                    + "Pass loadProfile=LOW (1 statement, 10 txns) or HIGH (10 statements, 100 txns each). "
+                    + "LOW: 10 accounts · 5 statements · 100 transactions. "
+                    + "MEDIUM: 100 accounts · 50 statements · 1 000 transactions. "
+                    + "HIGH: 1 000 accounts · 500 statements · 10 000 transactions. "
                     + "Defaults to LOW.")
     public ResponseEntity<RandomStatementResponse> generate(
             @RequestParam(name = "loadProfile", required = false, defaultValue = "LOW") LoadProfile loadProfile) {
@@ -58,6 +62,7 @@ public class RandomStatementController {
                 result.firstStatementId(),
                 result.statementsGenerated(),
                 result.transactionsGenerated(),
+                result.accountsGenerated(),
                 Instant.now()
         ));
     }
