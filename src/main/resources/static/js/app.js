@@ -575,7 +575,8 @@ async function diagrams() {
   }
   if (!mermaidOn) {
     mermaid.initialize({ startOnLoad:false, theme:'base', securityLevel:'loose',
-      themeVariables:{ primaryColor:'#00838F', primaryTextColor:'#fff', lineColor:'#555', fontSize:'14px' } });
+      themeVariables:{ primaryColor:'#00838F', primaryTextColor:'#fff', lineColor:'#555', fontSize:'14px',
+        attributeBackgroundColorEven:'#006064', attributeBackgroundColorOdd:'#00838F' } });
     mermaidOn = true;
   }
   for (const d of DIAGRAMS) {
@@ -699,7 +700,8 @@ const DIAGRAMS = [
   {
     id: 'd-db', title: '5. Database Schema (H2 In-Memory)',
     desc: 'bank_statements 1:N bank_transactions',
-    chart: `erDiagram
+    chart: `%%{init: {'themeVariables': {'primaryTextColor': '#B2EBF2', 'attributeBackgroundColorEven': '#006064', 'attributeBackgroundColorOdd': '#00838F'}}}%%
+erDiagram
   bank_statements {
     bigint id PK
     varchar statement_reference
