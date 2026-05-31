@@ -8,7 +8,7 @@ const ENGINES = ['PROWIDE', 'VELOCITY'];
 const FMT_COLOR = { MT940:'#E64A19', MT942:'#FF9800', CAMT052:'#FFC107', CAMT053:'#FF7043' };
 const ENG_COLOR = { PROWIDE:'#E64A19', VELOCITY:'#7B1FA2' };
 const STA_COLOR = { COMPLETED:'#4CAF50', FAILED:'#F44336', STARTED:'#FF9800', STARTING:'#FF9800' };
-const VIEWS     = ['dashboard', 'generate', 'convert', 'history', 'charts', 'diagrams'];
+const VIEWS     = ['dashboard', 'generate', 'convert', 'history', 'benchmarks', 'diagrams'];
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let theme      = localStorage.getItem('theme') || 'light';
@@ -63,7 +63,7 @@ function go(view) {
   window.location.hash = view;
   document.querySelectorAll('nav a').forEach(a => a.classList.toggle('active', a.dataset.view === view));
   show('<div class="spinner-wrap"><div class="spinner"></div></div>');
-  setTimeout(() => ({ dashboard, generate, convert, history, charts: viewCharts, diagrams }[view])(), 0);
+  setTimeout(() => ({ dashboard, generate, convert, history, benchmarks: viewCharts, diagrams }[view])(), 0);
 }
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
@@ -102,7 +102,7 @@ async function dashboard() {
       <div class="card link" onclick="go('generate')"><b>➕ Generate Statements</b><p class="muted sm">Create random data in H2</p></div>
       <div class="card link" onclick="go('convert')"><b>▶ Run Conversion</b><p class="muted sm">Export via Spring Batch</p></div>
       <div class="card link" onclick="go('history')"><b>📋 History</b><p class="muted sm">Browse past jobs</p></div>
-      <div class="card link" onclick="go('charts')"><b>📈 Charts</b><p class="muted sm">Performance analytics</p></div>
+      <div class="card link" onclick="go('benchmarks')"><b>📊 Benchmarks</b><p class="muted sm">Performance analytics</p></div>
       <div class="card link" onclick="window.open('/swagger-ui/index.html')"><b>📖 Swagger UI</b><p class="muted sm">Interactive API docs</p></div>
       <div class="card link" onclick="window.open('/actuator/health')"><b>❤️ Actuator</b><p class="muted sm">Health &amp; info endpoints</p></div>
     </div>
@@ -362,14 +362,14 @@ async function paintHistory() {
     </div>`;
 }
 
-// ── Charts ────────────────────────────────────────────────────────────────────
+// ── Benchmarks ────────────────────────────────────────────────────────────────
 async function viewCharts() {
   show(`
-    <h2>📈 Conversion Charts
+    <h2>📊 Benchmarks
       <button class="btn sm" onclick="refreshCharts()" style="margin-left:8px">🔄 Refresh</button>
     </h2>
     <p class="muted" style="margin-bottom:12px">Auto-refreshes every 30 s.</p>
-    <div id="charts-body"><div class="spinner-wrap"><div class="spinner"></div></div></div>
+    <div id="benchmarks-body"><div class="spinner-wrap"><div class="spinner"></div></div></div>
   `);
   await paintCharts();
   pollTimer = setInterval(refreshCharts, 30000);
@@ -383,7 +383,7 @@ async function refreshCharts() {
 
 async function paintCharts() {
   const jobs = await api.jobs();
-  const el   = $('charts-body');
+  const el   = $('benchmarks-body');
   if (!el) return;
 
   if (!jobs.length) {
@@ -609,7 +609,7 @@ const DIAGRAMS = [
     desc: 'HTML/JS SPA → REST API → Spring Batch → Strategy Pattern → output files',
     chart: `graph TB
   subgraph FE["🖥 HTML/JS SPA"]
-    UI["Dashboard · Generate · Runner · History · Charts · Diagrams"]
+    UI["Dashboard · Generate · Runner · History · Benchmarks · Diagrams"]
   end
   subgraph API["🔌 REST API"]
     RS["POST /api/random-statements"]
