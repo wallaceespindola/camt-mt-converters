@@ -41,17 +41,17 @@ skinparam actor {
 
 actor "Developer" as DEV
 
-node "Developer Machine  —  Build" as DEVMACHINE #ECEFF1;line:#455A64 {
+node "Developer Machine  —  Build" as DEVMACHINE #ECEFF1;line:455A64 {
   artifact "Source Code\nsrc/main/java + resources\nVanilla HTML/CSS/JS (static/)" as SRC
   artifact "Maven Build\nmvn clean package" as MVN
   artifact "Spring Boot JAR\ncamt-mt-converters-*.jar" as JAR
 }
 
-node "Runtime  —  localhost:8080" as RUNTIME #E3F2FD;line:#1565C0 {
-  artifact "Spring Boot App" as SB #BBDEFB;line:#1565C0
+node "Runtime  —  localhost:8080" as RUNTIME #E3F2FD;line:1565C0 {
+  artifact "Spring Boot App" as SB #BBDEFB;line:1565C0
   database "H2 In-Memory DB\nbank_statements · bank_transactions" as H2
   folder "output/\n*.mt940 · *.mt942 · *.xml" as OUTPUT
-  artifact "Static Resources\nVanilla JS SPA served at /" as STATIC_SRV #BBDEFB;line:#1565C0
+  artifact "Static Resources\nVanilla JS SPA served at /" as STATIC_SRV #BBDEFB;line:1565C0
 }
 
 actor "Browser\nlocalhost:8080" as CLIENT

@@ -8,36 +8,36 @@ skinparam arrowColor #546E7A
 skinparam arrowThickness 1.5
 skinparam rectangleBorderThickness 2
 
-rectangle "Internal Domain Model\nBankStatement / BankTransaction" as INPUT #BBDEFB;line:#1565C0
+rectangle "Internal Domain Model\nBankStatement / BankTransaction" as INPUT #BBDEFB;line:1565C0
 
 together {
-  rectangle "3-Stage Validation" as VALIDATE #FFF9C4;line:#F9A825 {
-    rectangle "1. Internal Model\nValidator" as VA #FFF9C4;line:#F9A825
-    rectangle "2. MT Re-parse\nvia Prowide" as VB #FFF9C4;line:#F9A825
-    rectangle "3. camt XSD\nValidation" as VC #FFF9C4;line:#F9A825
+  rectangle "3-Stage Validation" as VALIDATE #FFF9C4;line:F9A825 {
+    rectangle "1. Internal Model\nValidator" as VA #FFF9C4;line:F9A825
+    rectangle "2. MT Re-parse\nvia Prowide" as VB #FFF9C4;line:F9A825
+    rectangle "3. camt XSD\nValidation" as VC #FFF9C4;line:F9A825
   }
 }
 
 together {
-  rectangle "Prowide Engine" as PROWIDE #FBE9E7;line:#BF360C {
-    rectangle "MT940 via\nProwide Core" as P1 #FFCCBC;line:#BF360C
-    rectangle "MT942 via\nProwide Core" as P2 #FFCCBC;line:#BF360C
-    rectangle "camt.052 via\nProwide ISO 20022" as P3 #FFCCBC;line:#BF360C
-    rectangle "camt.053 via\nProwide ISO 20022" as P4 #FFCCBC;line:#BF360C
+  rectangle "Prowide Engine" as PROWIDE #FBE9E7;line:BF360C {
+    rectangle "MT940 via\nProwide Core" as P1 #FFCCBC;line:BF360C
+    rectangle "MT942 via\nProwide Core" as P2 #FFCCBC;line:BF360C
+    rectangle "camt.052 via\nProwide ISO 20022" as P3 #FFCCBC;line:BF360C
+    rectangle "camt.053 via\nProwide ISO 20022" as P4 #FFCCBC;line:BF360C
   }
 
-  rectangle "Velocity Engine" as VELOCITY #E8EAF6;line:#283593 {
-    rectangle "MT940 via\nmt940.vm" as V1 #C5CAE9;line:#283593
-    rectangle "MT942 via\nmt942.vm" as V2 #C5CAE9;line:#283593
-    rectangle "camt.052 via\ncamt052.vm" as V3 #C5CAE9;line:#283593
-    rectangle "camt.053 via\ncamt053.vm" as V4 #C5CAE9;line:#283593
+  rectangle "Velocity Engine" as VELOCITY #E8EAF6;line:283593 {
+    rectangle "MT940 via\nmt940.vm" as V1 #C5CAE9;line:283593
+    rectangle "MT942 via\nmt942.vm" as V2 #C5CAE9;line:283593
+    rectangle "camt.052 via\ncamt052.vm" as V3 #C5CAE9;line:283593
+    rectangle "camt.053 via\ncamt053.vm" as V4 #C5CAE9;line:283593
   }
 }
 
-collections "statement-N.mt940\ntext/plain" as OUT1 #C8E6C9;line:#2E7D32
-collections "statement-N.mt942\ntext/plain" as OUT2 #C8E6C9;line:#2E7D32
-collections "statement-N.camt052.xml\napplication/xml" as OUT3 #C8E6C9;line:#2E7D32
-collections "statement-N.camt053.xml\napplication/xml" as OUT4 #C8E6C9;line:#2E7D32
+collections "statement-N.mt940\ntext/plain" as OUT1 #C8E6C9;line:2E7D32
+collections "statement-N.mt942\ntext/plain" as OUT2 #C8E6C9;line:2E7D32
+collections "statement-N.camt052.xml\napplication/xml" as OUT3 #C8E6C9;line:2E7D32
+collections "statement-N.camt053.xml\napplication/xml" as OUT4 #C8E6C9;line:2E7D32
 
 INPUT    --> VALIDATE
 VALIDATE --> PROWIDE

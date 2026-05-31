@@ -22,69 +22,69 @@ skinparam interface {
   FontColor             #212121
 }
 
-interface StatementExportStrategy #B2EBF2;line:#00838F {
+interface StatementExportStrategy #B2EBF2;line:00838F {
   +targetFormat() : ConversionTargetFormat
   +engine() : ConversionEngine
   +export(statement : BankStatement) : GeneratedBankingFile
   +key() : StatementExportStrategyKey
 }
 
-class StatementExportStrategyFactory #FFE0B2;line:#E65100 {
+class StatementExportStrategyFactory #FFE0B2;line:E65100 {
   -strategies : Map<StatementExportStrategyKey, StatementExportStrategy>
   +getStrategy(fmt : ConversionTargetFormat, eng : ConversionEngine) : StatementExportStrategy
   +hasStrategy(fmt : ConversionTargetFormat, eng : ConversionEngine) : boolean
 }
 
-abstract class AbstractMtProwideStrategy #ECEFF1;line:#546E7A {
+abstract class AbstractMtProwideStrategy #ECEFF1;line:546E7A {
   #formatSwiftAmount(amount : BigDecimal) : String
   #formatBalanceLine(stmt : BankStatement, balance : BigDecimal, date : LocalDate, credit : boolean) : String
   #formatField61(tx : BankTransaction) : String
   #formatField86(tx : BankTransaction) : String
 }
 
-class InternalToMt940ProwideStrategy #FFCCBC;line:#BF360C {
+class InternalToMt940ProwideStrategy #FFCCBC;line:BF360C {
   +targetFormat() : ConversionTargetFormat
   +engine() : ConversionEngine
   +export(statement : BankStatement) : GeneratedBankingFile
 }
 
-class InternalToMt942ProwideStrategy #FFCCBC;line:#BF360C {
+class InternalToMt942ProwideStrategy #FFCCBC;line:BF360C {
   +targetFormat() : ConversionTargetFormat
   +engine() : ConversionEngine
   +export(statement : BankStatement) : GeneratedBankingFile
 }
 
-class InternalToCamt052ProwideStrategy #FFCCBC;line:#BF360C {
+class InternalToCamt052ProwideStrategy #FFCCBC;line:BF360C {
   +targetFormat() : ConversionTargetFormat
   +engine() : ConversionEngine
   +export(statement : BankStatement) : GeneratedBankingFile
 }
 
-class InternalToCamt053ProwideStrategy #FFCCBC;line:#BF360C {
+class InternalToCamt053ProwideStrategy #FFCCBC;line:BF360C {
   +targetFormat() : ConversionTargetFormat
   +engine() : ConversionEngine
   +export(statement : BankStatement) : GeneratedBankingFile
 }
 
-class InternalToMt940VelocityStrategy #C5CAE9;line:#283593 {
+class InternalToMt940VelocityStrategy #C5CAE9;line:283593 {
   +targetFormat() : ConversionTargetFormat
   +engine() : ConversionEngine
   +export(statement : BankStatement) : GeneratedBankingFile
 }
 
-class InternalToMt942VelocityStrategy #C5CAE9;line:#283593 {
+class InternalToMt942VelocityStrategy #C5CAE9;line:283593 {
   +targetFormat() : ConversionTargetFormat
   +engine() : ConversionEngine
   +export(statement : BankStatement) : GeneratedBankingFile
 }
 
-class InternalToCamt052VelocityStrategy #C5CAE9;line:#283593 {
+class InternalToCamt052VelocityStrategy #C5CAE9;line:283593 {
   +targetFormat() : ConversionTargetFormat
   +engine() : ConversionEngine
   +export(statement : BankStatement) : GeneratedBankingFile
 }
 
-class InternalToCamt053VelocityStrategy #C5CAE9;line:#283593 {
+class InternalToCamt053VelocityStrategy #C5CAE9;line:283593 {
   +targetFormat() : ConversionTargetFormat
   +engine() : ConversionEngine
   +export(statement : BankStatement) : GeneratedBankingFile

@@ -9,38 +9,38 @@ skinparam arrowColor #546E7A
 skinparam arrowThickness 1.5
 skinparam packageBorderThickness 2
 
-package "HTML/JS SPA" as Frontend #FBE9E7;line:#E64A19 {
-  [Dashboard · Generate · Runner\nHistory · Benchmarks · Diagrams] as UI #FFCCBC;line:#E64A19
+package "HTML/JS SPA" as Frontend #FBE9E7;line:E64A19 {
+  [Dashboard · Generate · Runner\nHistory · Benchmarks · Diagrams] as UI #FFCCBC;line:E64A19
 }
 
-package "REST API Layer" as API #E3F2FD;line:#1565C0 {
-  [RandomStatementController\nPOST /api/random-statements] as RS #BBDEFB;line:#1565C0
-  [StatementConversionController\nPOST /api/conversions\nGET /api/conversions/jobs] as CV #BBDEFB;line:#1565C0
-  [Spring Actuator\n/actuator/health · /actuator/info] as ACT #BBDEFB;line:#1565C0
+package "REST API Layer" as API #E3F2FD;line:1565C0 {
+  [RandomStatementController\nPOST /api/random-statements] as RS #BBDEFB;line:1565C0
+  [StatementConversionController\nPOST /api/conversions\nGET /api/conversions/jobs] as CV #BBDEFB;line:1565C0
+  [Spring Actuator\n/actuator/health · /actuator/info] as ACT #BBDEFB;line:1565C0
 }
 
-package "Spring Batch Pipeline" as Batch #E8F5E9;line:#2E7D32 {
-  [JobLauncher] as JL #C8E6C9;line:#2E7D32
-  [statementExportJob] as JOB #C8E6C9;line:#2E7D32
-  [statementExportStep\n(chunk-size = 1)] as STEP #C8E6C9;line:#2E7D32
-  [BankStatementItemReader] as READER #C8E6C9;line:#2E7D32
-  [StatementExportProcessor] as PROC #C8E6C9;line:#2E7D32
-  [BankingFileWriter] as WRITER #C8E6C9;line:#2E7D32
+package "Spring Batch Pipeline" as Batch #E8F5E9;line:2E7D32 {
+  [JobLauncher] as JL #C8E6C9;line:2E7D32
+  [statementExportJob] as JOB #C8E6C9;line:2E7D32
+  [statementExportStep\n(chunk-size = 1)] as STEP #C8E6C9;line:2E7D32
+  [BankStatementItemReader] as READER #C8E6C9;line:2E7D32
+  [StatementExportProcessor] as PROC #C8E6C9;line:2E7D32
+  [BankingFileWriter] as WRITER #C8E6C9;line:2E7D32
 }
 
-package "Strategy Pattern × 8" as Strategy #F3E5F5;line:#6A1B9A {
-  [StatementExportStrategyFactory] as SF #CE93D8;line:#6A1B9A
-  [Prowide: MT940 · MT942\ncamt.052 · camt.053] as P4 #FFAB91;line:#BF360C
-  [Velocity: MT940 · MT942\ncamt.052 · camt.053] as V4 #9FA8DA;line:#283593
+package "Strategy Pattern × 8" as Strategy #F3E5F5;line:6A1B9A {
+  [StatementExportStrategyFactory] as SF #CE93D8;line:6A1B9A
+  [Prowide: MT940 · MT942\ncamt.052 · camt.053] as P4 #FFAB91;line:BF360C
+  [Velocity: MT940 · MT942\ncamt.052 · camt.053] as V4 #9FA8DA;line:283593
 }
 
-database "H2 In-Memory DB" as DB #EFEBE9;line:#5D4037 {
-  [bank_statements] as BS #D7CCC8;line:#5D4037
-  [bank_transactions] as BT #D7CCC8;line:#5D4037
+database "H2 In-Memory DB" as DB #EFEBE9;line:5D4037 {
+  [bank_statements] as BS #D7CCC8;line:5D4037
+  [bank_transactions] as BT #D7CCC8;line:5D4037
 }
 
-folder "output/" as OUTPUT #ECEFF1;line:#455A64 {
-  [*.mt940 · *.mt942\n*.camt052.xml · *.camt053.xml] as FILES #CFD8DC;line:#455A64
+folder "output/" as OUTPUT #ECEFF1;line:455A64 {
+  [*.mt940 · *.mt942\n*.camt052.xml · *.camt053.xml] as FILES #CFD8DC;line:455A64
 }
 
 UI --> RS
