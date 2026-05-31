@@ -137,7 +137,7 @@ function generate() {
     <p class="muted" style="margin-bottom:16px">
       Generate random bank statements in H2. Use the returned ID in the Conversion Runner.
     </p>
-    <div class="g2" style="margin-bottom:16px">
+    <div class="g3" style="margin-bottom:16px">
       <div class="card">
         <b>⚡ Low Load</b><hr>
         <p>1 statement · 10 transactions</p>
@@ -148,15 +148,22 @@ function generate() {
         <p>10 statements · 100 transactions</p>
         <button class="btn full" id="btn-high" onclick="doGenerate('HIGH')" style="margin-top:12px">🚀 Generate High</button>
       </div>
+      <div class="card">
+        <b>🔥 Extreme Load</b><hr>
+        <p>100 statements · 1000 transactions</p>
+        <button class="btn full" id="btn-extreme" onclick="doGenerate('EXTREME')" style="margin-top:12px">🔥 Generate Extreme</button>
+      </div>
     </div>
     <div id="gen-result"></div>
   `);
 }
 
+const PROFILE_LABELS = { LOW: '▶ Generate Low', HIGH: '🚀 Generate High', EXTREME: '🔥 Generate Extreme' };
+
 async function doGenerate(profile) {
-  const btn   = $('btn-' + profile.toLowerCase());
-  const other = $('btn-' + (profile === 'LOW' ? 'high' : 'low'));
-  btn.disabled = other.disabled = true;
+  const allBtns = ['low', 'high', 'extreme'].map(p => $('btn-' + p)).filter(Boolean);
+  allBtns.forEach(b => { b.disabled = true; });
+  const btn = $('btn-' + profile.toLowerCase());
   btn.textContent = 'Generating…';
 
   try {
@@ -182,8 +189,8 @@ async function doGenerate(profile) {
   } catch (e) {
     $('gen-result').innerHTML = `<p class="red" style="margin-top:12px">Error: ${esc(e.message)}</p>`;
   } finally {
-    btn.disabled = other.disabled = false;
-    btn.textContent = profile === 'LOW' ? '▶ Generate Low' : '🚀 Generate High';
+    allBtns.forEach(b => { b.disabled = false; });
+    btn.textContent = PROFILE_LABELS[profile];
   }
 }
 
@@ -398,6 +405,19 @@ async function paintCharts() {
       </div>
     </div>`).join('');
 
+  const bench    = benchmark(jobs);
+  const benchRows = bench.map(r => `
+    <tr>
+      <td><span class="chip" style="background:${FMT_COLOR[r.fmt]||'#999'};color:#fff">${esc(r.fmt)}</span></td>
+      <td><span class="chip" style="background:${ENG_COLOR[r.eng]||'#999'};color:#fff">${esc(r.eng)}</span></td>
+      <td style="text-align:right">${r.n}</td>
+      <td style="text-align:right">${r.min > 0 ? r.min+' ms' : '—'}</td>
+      <td style="text-align:right">${r.avg > 0 ? r.avg+' ms' : '—'}</td>
+      <td style="text-align:right">${r.max > 0 ? r.max+' ms' : '—'}</td>
+      <td style="text-align:right">${r.p95 > 0 ? r.p95+' ms' : '—'}</td>
+      <td style="text-align:right"><b style="color:${r.rate>=80?'var(--green)':'var(--red)'}">${r.rate}%</b></td>
+    </tr>`).join('');
+
   el.innerHTML = `
     <div class="g4" style="margin-bottom:16px">${summCards}</div>
     <div class="g2" style="margin-bottom:16px">
@@ -406,11 +426,37 @@ async function paintCharts() {
         ${byEng.length ? '<canvas id="c-eng"></canvas>' : '<p class="muted">No completed jobs with timing yet.</p>'}
       </div>
     </div>
-    <div class="g2">
+    <div class="g2" style="margin-bottom:16px">
       <div class="card"><b>Duration — Last ${Math.min(20, last20.length)} Runs</b><hr>
         ${last20.length ? '<canvas id="c-runs"></canvas>' : '<p class="muted">No timing data yet.</p>'}
       </div>
       <div class="card"><b>Jobs by Status</b><hr><canvas id="c-sta"></canvas></div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <b>⚡ Strategy Benchmark — Prowide vs Velocity</b>
+      <p class="muted sm" style="margin:4px 0 12px">Avg duration (ms) per format, grouped by engine. Only COMPLETED jobs with timing data.</p>
+      ${bench.some(r => r.avg > 0) ? '<canvas id="c-bench" style="max-height:260px"></canvas>' : '<p class="muted">No timing data yet — run some conversions first.</p>'}
+    </div>
+    <div class="card">
+      <b>📊 Full Benchmark Stats — All 8 Strategy Combinations</b>
+      <p class="muted sm" style="margin:4px 0 12px">Per-combination min / avg / max / p95 and success rate.</p>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:.875rem">
+          <thead>
+            <tr style="text-align:left;border-bottom:1px solid var(--border)">
+              <th style="padding:6px 8px">Format</th>
+              <th style="padding:6px 8px">Engine</th>
+              <th style="padding:6px 8px;text-align:right">Jobs</th>
+              <th style="padding:6px 8px;text-align:right">Min</th>
+              <th style="padding:6px 8px;text-align:right">Avg</th>
+              <th style="padding:6px 8px;text-align:right">Max</th>
+              <th style="padding:6px 8px;text-align:right">p95</th>
+              <th style="padding:6px 8px;text-align:right">Success</th>
+            </tr>
+          </thead>
+          <tbody>${benchRows}</tbody>
+        </table>
+      </div>
     </div>`;
 
   if (typeof Chart === 'undefined') return;
@@ -439,6 +485,26 @@ async function paintCharts() {
         datasets: [{ label:'ms', data: last20.map(p => p.ms), borderColor:'#E64A19', backgroundColor:'rgba(230,74,25,.1)', borderWidth:2, tension:.25 }],
       },
       options: { scales: { y: { beginAtZero: true } } },
+    }));
+  }
+
+  const cBench = document.getElementById('c-bench');
+  if (cBench && bench.some(r => r.avg > 0)) {
+    const prowideData  = FORMATS.map(f => { const r = bench.find(b => b.fmt===f && b.eng==='PROWIDE');  return r ? r.avg : 0; });
+    const velocityData = FORMATS.map(f => { const r = bench.find(b => b.fmt===f && b.eng==='VELOCITY'); return r ? r.avg : 0; });
+    chartObjs.push(new Chart(cBench, {
+      type: 'bar',
+      data: {
+        labels: FORMATS,
+        datasets: [
+          { label: 'PROWIDE',  data: prowideData,  backgroundColor: ENG_COLOR.PROWIDE  + 'cc' },
+          { label: 'VELOCITY', data: velocityData, backgroundColor: ENG_COLOR.VELOCITY + 'cc' },
+        ],
+      },
+      options: {
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true, title: { display: true, text: 'Avg duration (ms)' } } },
+      },
     }));
   }
 }
@@ -470,6 +536,21 @@ function metrics(jobs) {
   const bySta = Object.entries(sM).map(([st,cnt]) => ({ st, cnt }));
 
   return { byFmt, byEng, last20, bySta };
+}
+
+function benchmark(jobs) {
+  return FORMATS.flatMap(fmt => ENGINES.map(eng => {
+    const all  = jobs.filter(j => j.targetFormat === fmt && j.engine === eng);
+    const ok   = all.filter(j => j.status === 'COMPLETED');
+    const durs = ok.map(j => j.durationMs).filter(d => d > 0).sort((a, b) => a - b);
+    const n    = all.length;
+    const min  = durs.length ? durs[0] : 0;
+    const max  = durs.length ? durs[durs.length - 1] : 0;
+    const avg  = durs.length ? Math.round(durs.reduce((a, b) => a + b, 0) / durs.length) : 0;
+    const p95  = durs.length ? durs[Math.floor(durs.length * 0.95)] || durs[durs.length - 1] : 0;
+    const rate = n ? Math.round(ok.length / n * 100) : 0;
+    return { fmt, eng, n, min, avg, max, p95, rate };
+  }));
 }
 
 // ── Diagrams ──────────────────────────────────────────────────────────────────

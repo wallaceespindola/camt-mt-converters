@@ -6,7 +6,10 @@ public enum LoadProfile {
     LOW(1, 10),
 
     /** 10 statements with 100 transactions each */
-    HIGH(10, 100);
+    HIGH(10, 100),
+
+    /** 100 statements with 1000 transactions each */
+    EXTREME(100, 1000);
 
     private final int statementCount;
     private final int transactionsPerStatement;
