@@ -700,7 +700,7 @@ const DIAGRAMS = [
   {
     id: 'd-db', title: '5. Database Schema (H2 In-Memory)',
     desc: 'bank_statements 1:N bank_transactions',
-    chart: `%%{init: {'themeVariables': {'primaryTextColor': '#B2EBF2', 'attributeBackgroundColorEven': '#006064', 'attributeBackgroundColorOdd': '#00838F'}}}%%
+    chart: `%%{init: {"themeVariables": {"primaryTextColor": "#B2EBF2", "attributeBackgroundColorEven": "#006064", "attributeBackgroundColorOdd": "#00838F"}}}%%
 erDiagram
   bank_statements {
     bigint id PK
@@ -722,5 +722,145 @@ erDiagram
     varchar remittance_information
   }
   bank_statements ||--o{ bank_transactions : "contains"`,
+  },
+  {
+    id: 'd-comp', title: '6. Component Diagram',
+    desc: 'Package-level components and their dependencies',
+    chart: `%%{init: {"themeVariables": {"lineColor": "#555555", "fontSize": "13px"}}}%%
+graph LR
+  subgraph API["🔌  api/"]
+    RC[RandomStatementController]
+    CC[StatementConversionController]
+    GEH[GlobalExceptionHandler]
+  end
+  subgraph BATCH["⚙  batch/"]
+    IR[BankStatementItemReader]
+    IP[StatementExportProcessor]
+    IW[BankingFileWriter]
+    BJS[BatchJobService]
+    BML[BatchJobMetricsListener]
+  end
+  subgraph CONV["🔀  conversion/"]
+    SSF[StatementExportStrategyFactory]
+    SSI[StatementExportStrategy]
+    subgraph PROWIDE["strategy/prowide/"]
+      PM940[Mt940ProwideStrategy]
+      PM942[Mt942ProwideStrategy]
+      PC052[Camt052ProwideStrategy]
+      PC053[Camt053ProwideStrategy]
+    end
+    subgraph VELOCITY["strategy/velocity/"]
+      VM940[Mt940VelocityStrategy]
+      VM942[Mt942VelocityStrategy]
+      VC052[Camt052VelocityStrategy]
+      VC053[Camt053VelocityStrategy]
+    end
+  end
+  subgraph SERVICES["🛠  services/"]
+    RSS[RandomStatementService]
+    BSM[BankStatementMapper]
+    ISV[InternalStatementValidator]
+    VR[VelocityRenderer]
+  end
+  subgraph DOMAIN["🗄  domain/ + persistence/"]
+    BS[BankStatement record]
+    BT[BankTransaction record]
+    BSE[BankStatementEntity]
+    BTE[BankTransactionEntity]
+    REPO[BankStatementRepository]
+  end
+  RC --> RSS
+  CC --> BJS
+  BJS --> IR
+  BJS --> IP
+  BJS --> IW
+  IP --> BSM
+  IP --> ISV
+  IP --> SSF
+  SSF --> SSI
+  PM940 -.->|implements| SSI
+  PM942 -.->|implements| SSI
+  PC052 -.->|implements| SSI
+  PC053 -.->|implements| SSI
+  VM940 -.->|implements| SSI
+  VM942 -.->|implements| SSI
+  VC052 -.->|implements| SSI
+  VC053 -.->|implements| SSI
+  VM940 --> VR
+  VM942 --> VR
+  VC052 --> VR
+  VC053 --> VR
+  BSM --> BSE
+  IR --> REPO
+  REPO --> BSE
+  BSE --> BTE
+  classDef apiCls    fill:#1565C0,stroke:#0D47A1,color:#fff
+  classDef batchCls  fill:#2E7D32,stroke:#1B5E20,color:#fff
+  classDef factCls   fill:#00838F,stroke:#006064,color:#fff
+  classDef intCls    fill:#455A64,stroke:#263238,color:#fff
+  classDef prowCls   fill:#BF360C,stroke:#7F0000,color:#fff
+  classDef velCls    fill:#7B1FA2,stroke:#4A148C,color:#fff
+  classDef svcCls    fill:#E65100,stroke:#BF360C,color:#fff
+  classDef domainCls fill:#5D4037,stroke:#3E2723,color:#fff
+  class RC,CC,GEH apiCls
+  class IR,IP,IW,BJS,BML batchCls
+  class SSF factCls
+  class SSI intCls
+  class PM940,PM942,PC052,PC053 prowCls
+  class VM940,VM942,VC052,VC053 velCls
+  class RSS,BSM,ISV,VR svcCls
+  class BS,BT,BSE,BTE,REPO domainCls
+  style API      fill:#E3F2FD,stroke:#1565C0,stroke-width:2px
+  style BATCH    fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px
+  style CONV     fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px
+  style PROWIDE  fill:#FBE9E7,stroke:#BF360C,stroke-width:2px
+  style VELOCITY fill:#EDE7F6,stroke:#7B1FA2,stroke-width:2px
+  style SERVICES fill:#FFF8E1,stroke:#E65100,stroke-width:2px
+  style DOMAIN   fill:#EFEBE9,stroke:#5D4037,stroke-width:2px`,
+  },
+  {
+    id: 'd-deploy', title: '7. Deployment Diagram',
+    desc: 'Build → runtime → browser — localhost:8080',
+    chart: `%%{init: {"themeVariables": {"lineColor": "#555555", "fontSize": "14px"}}}%%
+graph TB
+  subgraph DEV["💻  Developer Machine  —  Build"]
+    SRC["Source Code\nsrc/main/java + resources\nVanilla HTML/CSS/JS (static/)"]
+    MVN["Maven Build\nmvn clean package"]
+    JAR["Spring Boot JAR\ncamt-mt-converters-*.jar"]
+    SRC --> MVN
+    MVN --> JAR
+  end
+  subgraph RUNTIME["🚀  Runtime  —  localhost:8080"]
+    SB["Spring Boot App"]
+    H2[("H2 In-Memory DB\nbank_statements · bank_transactions")]
+    OUTPUT["output/\n*.mt940 · *.mt942 · *.xml"]
+    STATIC_SRV["Static Resources\nVanilla JS SPA served at /"]
+    SB --> H2
+    SB --> OUTPUT
+    SB --> STATIC_SRV
+  end
+  subgraph BROWSER["🌐  Browser  —  localhost:8080"]
+    SPA["Vanilla JS SPA\nDashboard · Runner · Benchmarks · Diagrams"]
+    SWAGGER["Swagger UI\n/swagger-ui.html"]
+    ACTUATOR["Actuator\n/actuator/health · /actuator/info"]
+  end
+  JAR --> SB
+  SPA --> STATIC_SRV
+  SPA --> SB
+  SWAGGER --> SB
+  ACTUATOR --> SB
+  classDef buildCls   fill:#37474F,stroke:#263238,color:#fff
+  classDef runtimeCls fill:#1565C0,stroke:#0D47A1,color:#fff
+  classDef dbCls      fill:#5D4037,stroke:#3E2723,color:#fff
+  classDef outCls     fill:#546E7A,stroke:#37474F,color:#fff
+  classDef browserCls fill:#2E7D32,stroke:#1B5E20,color:#fff
+  class SRC,MVN,JAR buildCls
+  class SB,STATIC_SRV runtimeCls
+  class H2 dbCls
+  class OUTPUT outCls
+  class SPA,SWAGGER,ACTUATOR browserCls
+  style DEV     fill:#F5F5F5,stroke:#37474F,stroke-width:2px
+  style RUNTIME fill:#E3F2FD,stroke:#1565C0,stroke-width:2px
+  style BROWSER fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px`,
   },
 ];

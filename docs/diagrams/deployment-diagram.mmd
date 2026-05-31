@@ -1,22 +1,18 @@
 %%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#555555', 'fontSize': '14px'}}}%%
 graph TB
     subgraph DEV["💻  Developer Machine  —  Build"]
-        SRC["Source Code\nsrc/main/java + resources"]
-        FE_SRC["Frontend Source\nsrc/main/frontend\nReact 19 + MUI + Vite"]
-        STATIC["Pre-built React Bundle\nsrc/main/resources/static/"]
+        SRC["Source Code\nsrc/main/java + resources\nVanilla HTML/CSS/JS (static/)"]
         MVN["Maven Build\nmvn clean package"]
-        JAR["Spring Boot JAR\ncamt-mt-converters-1.0.0-SNAPSHOT.jar"]
-        FE_SRC --> STATIC
+        JAR["Spring Boot JAR\ncamt-mt-converters-*.jar"]
         SRC --> MVN
-        STATIC --> MVN
         MVN --> JAR
     end
 
     subgraph RUNTIME["🚀  Runtime  —  localhost:8080"]
-        SB["Spring Boot App\ncamt-mt-converters-1.0.0-SNAPSHOT.jar"]
-        H2[("H2 In-Memory DB\nbankingdb\nbank_statements · bank_transactions")]
-        OUTPUT["output/\nGenerated banking files\n*.mt940 · *.mt942 · *.xml"]
-        STATIC_SRV["Static Resources\nReact SPA served at /"]
+        SB["Spring Boot App"]
+        H2[("H2 In-Memory DB\nbank_statements · bank_transactions")]
+        OUTPUT["output/\n*.mt940 · *.mt942 · *.xml"]
+        STATIC_SRV["Static Resources\nVanilla JS SPA served at /"]
         SB --> H2
         SB --> OUTPUT
         SB --> STATIC_SRV
@@ -24,7 +20,7 @@ graph TB
 
     subgraph BROWSER["🌐  Browser  —  localhost:8080"]
         SPA["Vanilla JS SPA\nDashboard · Runner · Benchmarks · Diagrams"]
-        SWAGGER["Swagger UI\n/swagger-ui.html\ndev profile only"]
+        SWAGGER["Swagger UI\n/swagger-ui.html"]
         ACTUATOR["Actuator\n/actuator/health · /actuator/info"]
     end
 
@@ -35,14 +31,12 @@ graph TB
     ACTUATOR --> SB
 
     classDef buildCls   fill:#37474F,stroke:#263238,color:#fff
-    classDef feCls      fill:#E64A19,stroke:#BF360C,color:#fff
     classDef runtimeCls fill:#1565C0,stroke:#0D47A1,color:#fff
     classDef dbCls      fill:#5D4037,stroke:#3E2723,color:#fff
     classDef outCls     fill:#546E7A,stroke:#37474F,color:#fff
     classDef browserCls fill:#2E7D32,stroke:#1B5E20,color:#fff
 
     class SRC,MVN,JAR buildCls
-    class FE_SRC,STATIC feCls
     class SB,STATIC_SRV runtimeCls
     class H2 dbCls
     class OUTPUT outCls
