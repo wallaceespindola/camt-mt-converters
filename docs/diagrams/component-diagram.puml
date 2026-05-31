@@ -1,72 +1,70 @@
 @startuml component-diagram
 !theme plain
 
-skinparam backgroundColor #FAFAFA
-skinparam component {
-  BackgroundColor #FFF3E0
-  BorderColor #E64A19
-}
-skinparam package {
-  BackgroundColor #FAFAFA
-  BorderColor #BDBDBD
-}
+skinparam componentStyle rectangle
+skinparam backgroundColor #F8F9FA
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam arrowColor #546E7A
+skinparam arrowThickness 1.5
+skinparam packageBorderThickness 2
 
-package "api/" as API {
-  [RandomStatementController] as RC
-  [StatementConversionController] as CC
-  [GlobalExceptionHandler] as GEH
+package "api/" as API #E3F2FD;line:#1565C0 {
+  [RandomStatementController]    as RC  #BBDEFB;line:#1565C0
+  [StatementConversionController] as CC #BBDEFB;line:#1565C0
+  [GlobalExceptionHandler]       as GEH #BBDEFB;line:#1565C0
 }
 
-package "batch/" as BATCH {
-  [BankStatementItemReader] as IR
-  [StatementExportProcessor] as IP
-  [BankingFileWriter] as IW
-  [BatchJobService] as BJS
-  [BatchJobMetricsListener] as BML
+package "batch/" as BATCH #E8F5E9;line:#2E7D32 {
+  [BankStatementItemReader]  as IR  #C8E6C9;line:#2E7D32
+  [StatementExportProcessor] as IP  #C8E6C9;line:#2E7D32
+  [BankingFileWriter]        as IW  #C8E6C9;line:#2E7D32
+  [BatchJobService]          as BJS #C8E6C9;line:#2E7D32
+  [BatchJobMetricsListener]  as BML #C8E6C9;line:#2E7D32
 }
 
-package "conversion/" as CONV {
-  [StatementExportStrategyFactory] as SSF
-  interface "StatementExportStrategy" as SSI
+package "conversion/" as CONV #F3E5F5;line:#6A1B9A {
+  [StatementExportStrategyFactory] as SSF #E1BEE7;line:#6A1B9A
+  interface "StatementExportStrategy" as SSI #B2EBF2;line:#00838F
 
-  package "strategy/prowide/" as PROWIDE {
-    [Mt940ProwideStrategy] as PM940
-    [Mt942ProwideStrategy] as PM942
-    [Camt052ProwideStrategy] as PC052
-    [Camt053ProwideStrategy] as PC053
+  package "strategy/prowide/" as PROWIDE #FBE9E7;line:#BF360C {
+    [Mt940ProwideStrategy]  as PM940 #FFCCBC;line:#BF360C
+    [Mt942ProwideStrategy]  as PM942 #FFCCBC;line:#BF360C
+    [Camt052ProwideStrategy] as PC052 #FFCCBC;line:#BF360C
+    [Camt053ProwideStrategy] as PC053 #FFCCBC;line:#BF360C
   }
 
-  package "strategy/velocity/" as VELOCITY {
-    [Mt940VelocityStrategy] as VM940
-    [Mt942VelocityStrategy] as VM942
-    [Camt052VelocityStrategy] as VC052
-    [Camt053VelocityStrategy] as VC053
+  package "strategy/velocity/" as VELOCITY #E8EAF6;line:#283593 {
+    [Mt940VelocityStrategy]  as VM940 #C5CAE9;line:#283593
+    [Mt942VelocityStrategy]  as VM942 #C5CAE9;line:#283593
+    [Camt052VelocityStrategy] as VC052 #C5CAE9;line:#283593
+    [Camt053VelocityStrategy] as VC053 #C5CAE9;line:#283593
   }
 }
 
-package "services/" as SERVICES {
-  [RandomStatementService] as RSS
-  [BankStatementMapper] as BSM
-  [InternalStatementValidator] as ISV
-  [VelocityRenderer] as VR
+package "services/" as SERVICES #FFF8E1;line:#E65100 {
+  [RandomStatementService]    as RSS #FFE0B2;line:#E65100
+  [BankStatementMapper]       as BSM #FFE0B2;line:#E65100
+  [InternalStatementValidator] as ISV #FFE0B2;line:#E65100
+  [VelocityRenderer]          as VR  #FFE0B2;line:#E65100
 }
 
-package "domain/ + persistence/" as DOMAIN {
-  [BankStatement record] as BS
-  [BankTransaction record] as BT
-  [BankStatementEntity] as BSE
-  [BankTransactionEntity] as BTE
-  [BankStatementRepository] as REPO
+package "domain/ + persistence/" as DOMAIN #EFEBE9;line:#5D4037 {
+  [BankStatement record]    as BS   #D7CCC8;line:#5D4037
+  [BankTransaction record]  as BT   #D7CCC8;line:#5D4037
+  [BankStatementEntity]     as BSE  #D7CCC8;line:#5D4037
+  [BankTransactionEntity]   as BTE  #D7CCC8;line:#5D4037
+  [BankStatementRepository] as REPO #D7CCC8;line:#5D4037
 }
 
-RC --> RSS
-CC --> BJS
+RC  --> RSS
+CC  --> BJS
 BJS --> IR
 BJS --> IP
 BJS --> IW
-IP --> BSM
-IP --> ISV
-IP --> SSF
+IP  --> BSM
+IP  --> ISV
+IP  --> SSF
 SSF --> SSI
 SSI <|.. PM940
 SSI <|.. PM942
@@ -80,9 +78,9 @@ VM940 --> VR
 VM942 --> VR
 VC052 --> VR
 VC053 --> VR
-BSM --> BSE
-IR --> REPO
+BSM  --> BSE
+IR   --> REPO
 REPO --> BSE
-BSE --> BTE
+BSE  --> BTE
 
 @enduml

@@ -1,10 +1,22 @@
 @startuml database-diagram
 !theme plain
 
-skinparam backgroundColor #FAFAFA
+skinparam backgroundColor #F8F9FA
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+
 skinparam entity {
-  BackgroundColor #FFF3E0
-  BorderColor #E64A19
+  BackgroundColor #D7CCC8
+  BorderColor     #5D4037
+  FontColor       #212121
+  HeaderBackgroundColor #5D4037
+  HeaderFontColor #FFFFFF
+  BorderThickness 2
+}
+
+skinparam arrow {
+  Color     #5D4037
+  Thickness 1.5
 }
 
 entity "bank_statements" as BS {

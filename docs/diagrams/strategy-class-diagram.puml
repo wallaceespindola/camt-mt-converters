@@ -1,90 +1,104 @@
 @startuml strategy-class-diagram
 !theme plain
 
-skinparam backgroundColor #FAFAFA
+skinparam backgroundColor #F8F9FA
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam classBorderThickness 2
+skinparam classArrowThickness 1.5
+
 skinparam class {
-  BackgroundColor #FFF3E0
-  BorderColor #E64A19
-  ArrowColor #E64A19
+  BackgroundColor #F5F5F5
+  BorderColor     #546E7A
+  ArrowColor      #546E7A
+  HeaderBackgroundColor #455A64
+  FontColor       #212121
 }
 
-interface StatementExportStrategy {
+skinparam interface {
+  BackgroundColor       #B2EBF2
+  BorderColor           #00838F
+  HeaderBackgroundColor #00838F
+  FontColor             #212121
+}
+
+interface StatementExportStrategy #B2EBF2;line:#00838F {
   +targetFormat() : ConversionTargetFormat
   +engine() : ConversionEngine
   +export(statement : BankStatement) : GeneratedBankingFile
   +key() : StatementExportStrategyKey
 }
 
-class StatementExportStrategyFactory {
+class StatementExportStrategyFactory #FFE0B2;line:#E65100 {
   -strategies : Map<StatementExportStrategyKey, StatementExportStrategy>
   +getStrategy(fmt : ConversionTargetFormat, eng : ConversionEngine) : StatementExportStrategy
   +hasStrategy(fmt : ConversionTargetFormat, eng : ConversionEngine) : boolean
 }
 
-abstract class AbstractMtProwideStrategy {
+abstract class AbstractMtProwideStrategy #ECEFF1;line:#546E7A {
   #formatSwiftAmount(amount : BigDecimal) : String
   #formatBalanceLine(stmt : BankStatement, balance : BigDecimal, date : LocalDate, credit : boolean) : String
   #formatField61(tx : BankTransaction) : String
   #formatField86(tx : BankTransaction) : String
 }
 
-class InternalToMt940ProwideStrategy {
+class InternalToMt940ProwideStrategy #FFCCBC;line:#BF360C {
   +targetFormat() : ConversionTargetFormat
   +engine() : ConversionEngine
   +export(statement : BankStatement) : GeneratedBankingFile
 }
 
-class InternalToMt942ProwideStrategy {
+class InternalToMt942ProwideStrategy #FFCCBC;line:#BF360C {
   +targetFormat() : ConversionTargetFormat
   +engine() : ConversionEngine
   +export(statement : BankStatement) : GeneratedBankingFile
 }
 
-class InternalToCamt052ProwideStrategy {
+class InternalToCamt052ProwideStrategy #FFCCBC;line:#BF360C {
   +targetFormat() : ConversionTargetFormat
   +engine() : ConversionEngine
   +export(statement : BankStatement) : GeneratedBankingFile
 }
 
-class InternalToCamt053ProwideStrategy {
+class InternalToCamt053ProwideStrategy #FFCCBC;line:#BF360C {
   +targetFormat() : ConversionTargetFormat
   +engine() : ConversionEngine
   +export(statement : BankStatement) : GeneratedBankingFile
 }
 
-class InternalToMt940VelocityStrategy {
+class InternalToMt940VelocityStrategy #C5CAE9;line:#283593 {
   +targetFormat() : ConversionTargetFormat
   +engine() : ConversionEngine
   +export(statement : BankStatement) : GeneratedBankingFile
 }
 
-class InternalToMt942VelocityStrategy {
+class InternalToMt942VelocityStrategy #C5CAE9;line:#283593 {
   +targetFormat() : ConversionTargetFormat
   +engine() : ConversionEngine
   +export(statement : BankStatement) : GeneratedBankingFile
 }
 
-class InternalToCamt052VelocityStrategy {
+class InternalToCamt052VelocityStrategy #C5CAE9;line:#283593 {
   +targetFormat() : ConversionTargetFormat
   +engine() : ConversionEngine
   +export(statement : BankStatement) : GeneratedBankingFile
 }
 
-class InternalToCamt053VelocityStrategy {
+class InternalToCamt053VelocityStrategy #C5CAE9;line:#283593 {
   +targetFormat() : ConversionTargetFormat
   +engine() : ConversionEngine
   +export(statement : BankStatement) : GeneratedBankingFile
 }
 
-StatementExportStrategy <|.. AbstractMtProwideStrategy
-StatementExportStrategy <|.. InternalToCamt052ProwideStrategy
-StatementExportStrategy <|.. InternalToCamt053ProwideStrategy
-StatementExportStrategy <|.. InternalToMt940VelocityStrategy
-StatementExportStrategy <|.. InternalToMt942VelocityStrategy
-StatementExportStrategy <|.. InternalToCamt052VelocityStrategy
-StatementExportStrategy <|.. InternalToCamt053VelocityStrategy
-AbstractMtProwideStrategy <|-- InternalToMt940ProwideStrategy
-AbstractMtProwideStrategy <|-- InternalToMt942ProwideStrategy
-StatementExportStrategyFactory --> StatementExportStrategy
+StatementExportStrategy      <|..  AbstractMtProwideStrategy
+StatementExportStrategy      <|..  InternalToCamt052ProwideStrategy
+StatementExportStrategy      <|..  InternalToCamt053ProwideStrategy
+StatementExportStrategy      <|..  InternalToMt940VelocityStrategy
+StatementExportStrategy      <|..  InternalToMt942VelocityStrategy
+StatementExportStrategy      <|..  InternalToCamt052VelocityStrategy
+StatementExportStrategy      <|..  InternalToCamt053VelocityStrategy
+AbstractMtProwideStrategy    <|--  InternalToMt940ProwideStrategy
+AbstractMtProwideStrategy    <|--  InternalToMt942ProwideStrategy
+StatementExportStrategyFactory -->  StatementExportStrategy
 
 @enduml

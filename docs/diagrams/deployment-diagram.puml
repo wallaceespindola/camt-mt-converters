@@ -1,47 +1,69 @@
 @startuml deployment-diagram
 !theme plain
 
-skinparam backgroundColor #FAFAFA
+skinparam backgroundColor #F8F9FA
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam arrowColor #546E7A
+skinparam arrowThickness 1.5
+skinparam nodeBorderThickness 2
+
 skinparam node {
-  BackgroundColor #FFF3E0
-  BorderColor #E64A19
+  BackgroundColor #ECEFF1
+  BorderColor     #455A64
+  FontColor       #263238
+  FontStyle       bold
 }
+
 skinparam artifact {
-  BackgroundColor #E3F2FD
-  BorderColor #1565C0
+  BackgroundColor #BBDEFB
+  BorderColor     #1565C0
+  FontColor       #0D47A1
 }
+
 skinparam database {
-  BackgroundColor #E8F5E9
-  BorderColor #2E7D32
+  BackgroundColor #D7CCC8
+  BorderColor     #5D4037
+  FontColor       #3E2723
+}
+
+skinparam folder {
+  BackgroundColor #CFD8DC
+  BorderColor     #455A64
+  FontColor       #263238
+}
+
+skinparam actor {
+  BackgroundColor #E8EAF6
+  BorderColor     #283593
+  FontColor       #1A237E
 }
 
 actor "Developer" as DEV
 
-node "Developer Machine" as DEVMACHINE {
-  artifact "Source Code" as SRC
-  artifact "Maven Build\n(mvn clean package)" as MVN
-  artifact "camt-mt-converters-1.0.0-SNAPSHOT.jar" as JAR
-  artifact "src/main/resources/static/\n(Pre-built React bundle)" as STATIC
+node "Developer Machine  —  Build" as DEVMACHINE #ECEFF1;line:#455A64 {
+  artifact "Source Code\nsrc/main/java + resources\nVanilla HTML/CSS/JS (static/)" as SRC
+  artifact "Maven Build\nmvn clean package" as MVN
+  artifact "Spring Boot JAR\ncamt-mt-converters-*.jar" as JAR
 }
 
-node "Runtime — localhost:8080" as RUNTIME {
-  artifact "Spring Boot Application\ncamt-mt-converters-1.0.0-SNAPSHOT.jar" as SB
-  database "H2 In-Memory DB\nbankingdb" as H2
-  folder "output/\n(Generated banking files)" as OUTPUT
-  artifact "Static Resources\nReact SPA served at /" as STATIC_SRV
+node "Runtime  —  localhost:8080" as RUNTIME #E3F2FD;line:#1565C0 {
+  artifact "Spring Boot App" as SB #BBDEFB;line:#1565C0
+  database "H2 In-Memory DB\nbank_statements · bank_transactions" as H2
+  folder "output/\n*.mt940 · *.mt942 · *.xml" as OUTPUT
+  artifact "Static Resources\nVanilla JS SPA served at /" as STATIC_SRV #BBDEFB;line:#1565C0
 }
 
 actor "Browser\nlocalhost:8080" as CLIENT
 
-DEV --> SRC
-SRC --> MVN
-MVN --> JAR
-JAR --> SB
-STATIC --> SB
-SB --> H2
-SB --> OUTPUT
-SB --> STATIC_SRV
-CLIENT --> STATIC_SRV
-CLIENT --> SB : REST API calls
+DEV          -->  SRC
+SRC          -->  MVN
+MVN          -->  JAR
+JAR          -->  SB
+SB           -->  H2
+SB           -->  OUTPUT
+SB           -->  STATIC_SRV
+CLIENT       -->  STATIC_SRV
+CLIENT       -->  SB  : REST API calls
 
 @enduml
