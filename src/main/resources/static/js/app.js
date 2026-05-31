@@ -573,18 +573,20 @@ async function diagrams() {
     DIAGRAMS.forEach(d => { const el=$(d.id); if(el) el.innerHTML='<p class="red">Mermaid CDN unavailable.</p>'; });
     return;
   }
-  if (!mermaidOn) {
-    mermaid.initialize({ startOnLoad:false, theme:'base', securityLevel:'loose',
-      themeVariables:{ primaryColor:'#00838F', primaryTextColor:'#fff', lineColor:'#555', fontSize:'14px',
-        attributeBackgroundColorEven:'#006064', attributeBackgroundColorOdd:'#00838F' } });
-    mermaidOn = true;
-  }
+  const baseCfg = { startOnLoad:false, theme:'base', securityLevel:'loose',
+    themeVariables:{ primaryColor:'#00838F', primaryTextColor:'#fff', lineColor:'#555', fontSize:'14px' } };
+  const erCfg  = { startOnLoad:false, theme:'base', securityLevel:'loose',
+    themeVariables:{ primaryColor:'#006064', primaryTextColor:'#B2EBF2', lineColor:'#555', fontSize:'14px',
+      attributeBackgroundColorEven:'#004D40', attributeBackgroundColorOdd:'#006064' } };
+  if (!mermaidOn) { mermaid.initialize(baseCfg); mermaidOn = true; }
   for (const d of DIAGRAMS) {
     const el = $(d.id);
     if (!el) continue;
     try {
+      if (d.id === 'd-db') mermaid.initialize(erCfg);
       const { svg } = await mermaid.render(d.id + '-svg', d.chart);
       el.innerHTML = svg;  // safe: mermaid-generated SVG from a static string constant
+      if (d.id === 'd-db') mermaid.initialize(baseCfg);
     } catch(e) {
       el.innerHTML = `<pre class="red">${esc(String(e))}</pre>`;
     }
