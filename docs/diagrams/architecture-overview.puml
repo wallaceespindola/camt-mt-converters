@@ -9,7 +9,7 @@ skinparam component {
 }
 
 package "React SPA (MUI + Recharts)" as Frontend {
-  [Dashboard / Generate / Runner / History / Charts / Diagrams] as UI
+  [Dashboard / Generate / Runner / History / Benchmarks / Diagrams] as UI
 }
 
 package "REST API Layer" as API {
