@@ -52,7 +52,7 @@ style: |
 8. **REST API** — Endpoints and usage
 9. **Frontend** — Vanilla HTML/JS SPA
 10. **Quick Start** — Running in seconds
-11. **Testing** — 45 tests, zero failures
+11. **Testing** — 46 tests, zero failures
 
 ---
 
@@ -288,10 +288,10 @@ Three files in `src/main/resources/static/`:
 | `js/app.js` | Router, 6 view functions, API calls, charts |
 
 **CDN at runtime (no local install):**
-- Chart.js 4.4 — bar/line charts in Charts view
+- Chart.js 4.4 — bar/line charts in Benchmarks view
 - Mermaid 11 — live architecture diagrams
 
-**6 views:** Dashboard · Generate · Conversion Runner · History · Charts · Diagrams
+**6 views:** Dashboard · Generate · Conversion Runner · History · Benchmarks · Diagrams
 
 Served directly by Spring Boot — open `http://localhost:8080`
 
@@ -343,7 +343,7 @@ open http://localhost:8080
 | Swagger | `SwaggerAvailabilityTest` | OpenAPI spec accessible |
 
 ```bash
-mvn verify    # runs all 45 tests + JaCoCo coverage check (≥40%)
+mvn verify    # runs all 46 tests + JaCoCo coverage check (≥40%)
 ```
 
 ---

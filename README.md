@@ -72,7 +72,7 @@ ISO 20022 is the global XML-based financial messaging standard mandated by the E
 %%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#555555', 'fontSize': '14px'}}}%%
 graph TB
     subgraph CLIENT["🖥  Client — HTML/JS SPA  :8080"]
-        UI["Dashboard · Generate · Conversion Runner · History · Charts · Diagrams"]
+        UI["Dashboard · Generate · Conversion Runner · History · Benchmarks · Diagrams"]
     end
 
     subgraph REST["🔌  REST API  :8080"]
@@ -300,7 +300,7 @@ A vanilla **HTML/CSS/JavaScript** single-page app served directly from `src/main
 | `static/js/app.js` | Router, view functions, API calls, chart and diagram logic |
 
 CDN dependencies loaded at runtime (no local install):
-- **Chart.js 4.4** — bar and line charts in the Charts view
+- **Chart.js 4.4** — bar and line charts in the Benchmarks view
 - **Mermaid 11** — live architecture diagrams in the Diagrams view
 
 ### Views
@@ -308,7 +308,7 @@ CDN dependencies loaded at runtime (no local install):
 | View | Hash | Description |
 |------|------|-------------|
 | **Dashboard** | `#dashboard` | Health status, app info, job summary, quick-action cards |
-| **Generate Statements** | `#generate` | Seed H2 with LOW or HIGH load profile; shows generated statement ID |
+| **Generate Statements** | `#generate` | Seed H2 with LOW, MEDIUM, or HIGH load profile; shows generated statement ID |
 | **Conversion Runner** | `#convert` | Select statement ID + format + engine; single run or all 8 combinations |
 | **History** | `#history` | Auto-refreshing table of all conversion job executions (every 15 s) |
 | **Charts** | `#charts` | Duration by format/engine, timeline, status breakdown (every 30 s) |
@@ -329,15 +329,16 @@ CDN dependencies loaded at runtime (no local install):
 
 ### Load Profiles
 
-| Profile | Statements | Transactions per Statement | Notes   |
-|---------|------------|----------------------------|---------|
-| `LOW`   | 1          | ~10                        | Default |
-| `HIGH`  | 10         | ~100                       | Stress  |
+| Profile  | Accounts | Statements | Transactions | Notes   |
+|----------|----------|------------|--------------|---------|
+| `LOW`    | 10       | 5          | 100          | Default |
+| `MEDIUM` | 100      | 50         | 1 000        | Load    |
+| `HIGH`   | 1 000    | 500        | 10 000       | Stress  |
 
 ### Example: Generate → Convert → Inspect
 
 ```bash
-# 1. Generate random statement (LOW — 1 statement, 10 transactions)
+# 1. Generate random statement (LOW — 10 accounts · 5 statements · 100 transactions)
 curl -s -X POST http://localhost:8080/api/random-statements | jq .
 
 # 2. Convert to MT940 using Prowide
@@ -358,7 +359,7 @@ curl -s -X POST http://localhost:8080/api/conversions \
 # 5. List all jobs
 curl -s http://localhost:8080/api/conversions/jobs | jq .
 
-# 6. HIGH load — 10 statements × 100 transactions
+# 6. HIGH load — 1 000 accounts · 500 statements · 10 000 transactions
 curl -s -X POST "http://localhost:8080/api/random-statements?loadProfile=HIGH" | jq .
 ```
 
@@ -507,7 +508,7 @@ output/
 | Actuator            | `ActuatorTest`                    | `TestRestTemplate`             |
 | Swagger             | `SwaggerAvailabilityTest`         | `TestRestTemplate`                           |
 
-**45 tests, 0 failures** — `mvn verify` green, JaCoCo check passes (≥40% instruction coverage enforced).
+**46 tests, 0 failures** — `mvn verify` green, JaCoCo check passes (≥40% instruction coverage enforced).
 
 ```bash
 make test                              # all tests + JaCoCo
@@ -578,7 +579,7 @@ camt-mt-converters/
 │   │   ├── css/style.css
 │   │   └── js/app.js
 │   └── templates/                     mt940.vm · mt942.vm · camt052.vm · camt053.vm
-├── src/test/java/                     11 test classes · 45 tests
+├── src/test/java/                     11 test classes · 46 tests
 ├── logs/                              Runtime logs + PID files (gitignored content)
 └── output/                            Generated banking files (gitignored; .gitkeep preserves dir)
 ```

@@ -43,7 +43,7 @@ Welcome. This presentation covers the Banking Statement Converter Platform — a
 8. REST API — Endpoints and usage
 9. Frontend — Vanilla HTML/JS SPA
 10. Quick Start — Running in seconds
-11. Testing — 45 tests, zero failures
+11. Testing — 46 tests, zero failures
 
 ---
 
@@ -242,10 +242,10 @@ curl -X POST http://localhost:8080/api/conversions \
 | View | Hash | Description |
 |------|------|-------------|
 | Dashboard | #dashboard | Health, info, job summary, quick-action cards |
-| Generate | #generate | Seed H2 with LOW or HIGH load profile |
+| Generate | #generate | Seed H2 with LOW, MEDIUM, or HIGH load profile |
 | Conversion Runner | #convert | Single run or all 8 format/engine combinations |
 | History | #history | Auto-refreshing job table (every 15 s) |
-| Charts | #charts | Duration by format/engine, timeline, status (30 s) |
+| Benchmarks | #benchmarks | Duration by format/engine, timeline, status (30 s) |
 | Diagrams | #diagrams | Live Mermaid architecture diagrams |
 
 ---
@@ -295,7 +295,7 @@ open http://localhost:8080
 | SwaggerAvailabilityTest | Swagger | OpenAPI spec accessible |
 
 **Banner:**
-> `mvn verify` — runs all 45 tests + JaCoCo coverage check
+> `mvn verify` — runs all 46 tests + JaCoCo coverage check
 
 ---
 
