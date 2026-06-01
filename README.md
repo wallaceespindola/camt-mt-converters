@@ -71,11 +71,11 @@ ISO 20022 is the global XML-based financial messaging standard mandated by the E
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': {'lineColor': '#555555', 'fontSize': '14px'}}}%%
 graph TB
-    subgraph CLIENT["🖥  Client — HTML/JS SPA  :8080"]
+    subgraph CLIENT["🖥  Client — HTML/JS SPA  :8081"]
         UI["Dashboard · Generate · Conversion Runner · History · Benchmarks · Diagrams"]
     end
 
-    subgraph REST["🔌  REST API  :8080"]
+    subgraph REST["🔌  REST API  :8081"]
         RSC["POST /api/random-statements\n?loadProfile=LOW|HIGH"]
         CVC["POST /api/conversions\nbody: statementId · targetFormat · engine"]
         JHC["GET /api/conversions/jobs"]
@@ -266,10 +266,10 @@ make help
 
 | URL | Description |
 |-----|-------------|
-| **http://localhost:8080** | Web UI (HTML/JS SPA) |
-| **http://localhost:8080/swagger-ui.html** | Swagger / OpenAPI docs |
-| **http://localhost:8080/h2-console** | H2 in-memory database console |
-| **http://localhost:8080/actuator/health** | Health endpoint |
+| **http://localhost:8081** | Web UI (HTML/JS SPA) |
+| **http://localhost:8081/swagger-ui.html** | Swagger / OpenAPI docs |
+| **http://localhost:8081/h2-console** | H2 in-memory database console |
+| **http://localhost:8081/actuator/health** | Health endpoint |
 
 ### Cross-Platform Run / Kill Scripts
 
@@ -339,28 +339,28 @@ CDN dependencies loaded at runtime (no local install):
 
 ```bash
 # 1. Generate random statement (LOW — 10 accounts · 5 statements · 100 transactions)
-curl -s -X POST http://localhost:8080/api/random-statements | jq .
+curl -s -X POST http://localhost:8081/api/random-statements | jq .
 
 # 2. Convert to MT940 using Prowide
-curl -s -X POST http://localhost:8080/api/conversions \
+curl -s -X POST http://localhost:8081/api/conversions \
   -H "Content-Type: application/json" \
   -d '{"statementId":1,"targetFormat":"MT940","engine":"PROWIDE"}' | jq .
 
 # 3. Convert to camt.053 using Prowide
-curl -s -X POST http://localhost:8080/api/conversions \
+curl -s -X POST http://localhost:8081/api/conversions \
   -H "Content-Type: application/json" \
   -d '{"statementId":1,"targetFormat":"CAMT053","engine":"PROWIDE"}' | jq .
 
 # 4. Convert to MT942 using Velocity template engine
-curl -s -X POST http://localhost:8080/api/conversions \
+curl -s -X POST http://localhost:8081/api/conversions \
   -H "Content-Type: application/json" \
   -d '{"statementId":1,"targetFormat":"MT942","engine":"VELOCITY"}' | jq .
 
 # 5. List all jobs
-curl -s http://localhost:8080/api/conversions/jobs | jq .
+curl -s http://localhost:8081/api/conversions/jobs | jq .
 
 # 6. HIGH load — 1 000 accounts · 500 statements · 10 000 transactions
-curl -s -X POST "http://localhost:8080/api/random-statements?loadProfile=HIGH" | jq .
+curl -s -X POST "http://localhost:8081/api/random-statements?loadProfile=HIGH" | jq .
 ```
 
 ---
@@ -375,7 +375,7 @@ curl -s -X POST "http://localhost:8080/api/random-statements?loadProfile=HIGH" |
 | `make test-unit`     | Unit tests only                                                      |
 | `make test-integration` | Integration tests only                                            |
 | `make clean`         | Remove build artifacts and generated output files                    |
-| `make kill`          | Kill Spring Boot process (port 8080) via `pkill`                     |
+| `make kill`          | Kill Spring Boot process (port 8081) via `pkill`                     |
 | `make run-script`    | Full build + start via `run.sh` — with health-check wait             |
 | `make kill-script`   | Stop backend via `kill.sh`                                           |
 | `make lint`          | Compiler warnings via `-Xlint:all`                                   |
@@ -425,8 +425,8 @@ They are also rendered live in the **Diagrams** view of the SPA (via Mermaid.js 
 Always available — no profile flag required:
 
 ```
-http://localhost:8080/swagger-ui.html
-http://localhost:8080/v3/api-docs
+http://localhost:8081/swagger-ui.html
+http://localhost:8081/v3/api-docs
 ```
 
 ```bash
@@ -439,10 +439,10 @@ mvn spring-boot:run   # or: make run
 
 ```bash
 # Health — shows H2 status, disk, custom version indicator
-curl http://localhost:8080/actuator/health
+curl http://localhost:8081/actuator/health
 
 # Build metadata (injected by spring-boot-maven-plugin build-info goal)
-curl http://localhost:8080/actuator/info
+curl http://localhost:8081/actuator/info
 ```
 
 Sample `/actuator/info`:

@@ -1,5 +1,5 @@
 @echo off
-REM run.bat — Build and start the Banking Statement Converter backend (port 8080)
+REM run.bat — Build and start the Banking Statement Converter backend (port 8081)
 REM Platform: Windows 10+  (CMD)
 REM Usage:
 REM   run.bat              — build and start (Swagger at /swagger-ui.html, H2 at /h2-console)
@@ -11,7 +11,7 @@ set "SCRIPT_DIR=%~dp0"
 set "LOG_DIR=%SCRIPT_DIR%logs"
 set "BACKEND_LOG=%LOG_DIR%\backend.log"
 set "BUILD_LOG=%LOG_DIR%\build.log"
-set "BACKEND_PORT=8080"
+set "BACKEND_PORT=8081"
 set "HEALTH_URL=http://localhost:%BACKEND_PORT%/actuator/health"
 set "WAIT_SECS=90"
 set "SKIP_BUILD=false"
@@ -87,11 +87,11 @@ REM ── summary ────────────────────�
 echo.
 echo ============================================================
 echo   Backend is running
-echo   UI        -^>  http://localhost:8080/
-echo   API       -^>  http://localhost:8080/api
-echo   Swagger   -^>  http://localhost:8080/swagger-ui.html
-echo   H2 DB     -^>  http://localhost:8080/h2-console
-echo   Health    -^>  http://localhost:8080/actuator/health
+echo   UI        -^>  http://localhost:8081/
+echo   API       -^>  http://localhost:8081/api
+echo   Swagger   -^>  http://localhost:8081/swagger-ui.html
+echo   H2 DB     -^>  http://localhost:8081/h2-console
+echo   Health    -^>  http://localhost:8081/actuator/health
 echo.
 echo   Stop:  kill.bat
 echo ============================================================

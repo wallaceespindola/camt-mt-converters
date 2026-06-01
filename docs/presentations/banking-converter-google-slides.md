@@ -219,7 +219,7 @@ Every conversion is a Spring Batch job. The unique runId timestamp prevents Spri
 | GET | /actuator/info | Build metadata (name, version, author) |
 
 ```bash
-curl -X POST http://localhost:8080/api/conversions \
+curl -X POST http://localhost:8081/api/conversions \
   -H "Content-Type: application/json" \
   -d '{"statementId":1,"targetFormat":"MT940","engine":"PROWIDE"}'
 ```
@@ -264,15 +264,15 @@ mvn spring-boot:run
 # OR:  ./run.sh  |  .\run.ps1  |  run.bat
 
 # 3. Open the browser
-open http://localhost:8080
+open http://localhost:8081
 ```
 
 | URL | Description |
 |-----|-------------|
-| http://localhost:8080 | Web UI — HTML/JS SPA |
-| http://localhost:8080/swagger-ui.html | Swagger / OpenAPI docs |
-| http://localhost:8080/h2-console | H2 in-memory database console |
-| http://localhost:8080/actuator/health | Health endpoint |
+| http://localhost:8081 | Web UI — HTML/JS SPA |
+| http://localhost:8081/swagger-ui.html | Swagger / OpenAPI docs |
+| http://localhost:8081/h2-console | H2 in-memory database console |
+| http://localhost:8081/actuator/health | Health endpoint |
 
 ---
 

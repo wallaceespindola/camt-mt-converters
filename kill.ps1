@@ -1,9 +1,9 @@
-# kill.ps1 - Stop the Banking Statement Converter backend (port 8080)
+# kill.ps1 - Stop the Banking Statement Converter backend (port 8081)
 # Platforms: macOS, Ubuntu/Debian Linux, Windows 10+  (requires PowerShell Core 7+ on Mac/Linux)
 # Usage:  .\kill.ps1   or   pwsh ./kill.ps1
 
 param(
-    [int[]]$Ports = @(8080)
+    [int[]]$Ports = @(8081)
 )
 
 # -- PS 5.x / Windows PowerShell compat shim ----------------------------------

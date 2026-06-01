@@ -26,11 +26,11 @@ test-unit: ## Run unit tests only
 test-integration: ## Run integration tests only
 	mvn verify -Dtest="*IntegrationTest,*IT" -DfailIfNoTests=false
 
-kill: ## Kill running Spring Boot process to free port 8080
+kill: ## Kill running Spring Boot process to free port 8081
 	@echo "Killing Spring Boot processes..."
 	@pkill -f 'java.*BankingConverterApplication' 2>/dev/null && echo "  Spring Boot stopped" || echo "  No Spring Boot process found"
 	@pkill -f 'java.*spring-boot:run' 2>/dev/null && echo "  Maven spring-boot:run stopped" || true
-	@echo "Done. Port 8080 released."
+	@echo "Done. Port 8081 released."
 
 clean: ## Remove build artifacts and generated output files
 	mvn clean

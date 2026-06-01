@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# kill.sh — Stop the Banking Statement Converter backend (port 8080)
+# kill.sh — Stop the Banking Statement Converter backend (port 8081)
 # Platforms: macOS, Ubuntu/Debian Linux
 # Usage: ./kill.sh
 
@@ -62,11 +62,11 @@ if pkill -f 'spring-boot:run' 2>/dev/null; then
 fi
 
 # ── 3. Port-based kill (final safety net) ────────────────────────────────────
-pids=$(get_port_pids 8080)
+pids=$(get_port_pids 8081)
 if [ -n "$pids" ]; then
   echo "$pids" | while IFS= read -r pid; do
     [ -n "$pid" ] && kill -9 "$pid" 2>/dev/null && \
-      success "Freed port 8080 (killed PID $pid)"
+      success "Freed port 8081 (killed PID $pid)"
   done
   killed=$((killed + 1))
 fi

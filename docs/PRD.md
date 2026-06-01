@@ -643,7 +643,7 @@ The repository shall include a `Makefile`. Running `make` without arguments shal
 | `make test-unit` | Run unit tests only |
 | `make test-integration` | Run integration tests only |
 | `make clean` | Remove build artifacts and output files |
-| `make kill` | Kill running Spring Boot process (free port 8080) |
+| `make kill` | Kill running Spring Boot process (free port 8081) |
 | `make lint` | Run static analysis and compiler warnings |
 | `make docs` | Generate JaCoCo HTML coverage report |
 | `make help` | Display all commands and descriptions |

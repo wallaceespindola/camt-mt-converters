@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# run.sh — Build and start the Banking Statement Converter backend (port 8080)
+# run.sh — Build and start the Banking Statement Converter backend (port 8081)
 # Platforms: macOS, Ubuntu/Debian Linux
 # Usage:
 #   ./run.sh              — build and start (Swagger at /swagger-ui.html, H2 at /h2-console)
@@ -13,7 +13,7 @@ BACKEND_LOG="$LOG_DIR/backend.log"
 BACKEND_ERR="$LOG_DIR/backend-err.log"
 BUILD_LOG="$LOG_DIR/build.log"
 PID_FILE="$LOG_DIR/backend.pid"
-BACKEND_PORT=8080
+BACKEND_PORT=8081
 HEALTH_URL="http://localhost:${BACKEND_PORT}/actuator/health"
 WAIT_SECS=90
 SKIP_BUILD=false
@@ -120,11 +120,11 @@ done
 echo ""
 echo "╔══════════════════════════════════════════════════════════════╗"
 echo "║  Backend is running                                          ║"
-echo "║  UI        →  http://localhost:8080/                         ║"
-echo "║  API       →  http://localhost:8080/api                      ║"
-echo "║  Swagger   →  http://localhost:8080/swagger-ui.html          ║"
-echo "║  H2 DB     →  http://localhost:8080/h2-console               ║"
-echo "║  Health    →  http://localhost:8080/actuator/health          ║"
+echo "║  UI        →  http://localhost:8081/                         ║"
+echo "║  API       →  http://localhost:8081/api                      ║"
+echo "║  Swagger   →  http://localhost:8081/swagger-ui.html          ║"
+echo "║  H2 DB     →  http://localhost:8081/h2-console               ║"
+echo "║  Health    →  http://localhost:8081/actuator/health          ║"
 echo "║                                                              ║"
 echo "║  Stop:  ./kill.sh                                            ║"
 echo "╚══════════════════════════════════════════════════════════════╝"

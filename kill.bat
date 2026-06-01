@@ -1,5 +1,5 @@
 @echo off
-REM kill.bat — Stop the Banking Statement Converter backend (port 8080)
+REM kill.bat — Stop the Banking Statement Converter backend (port 8081)
 REM Platform: Windows 10+  (CMD)
 REM Usage: kill.bat
 
@@ -13,15 +13,15 @@ echo.
 echo [INFO]  Stopping Banking Statement Converter backend...
 echo.
 
-REM ── 1. Kill by port 8080 (Spring Boot backend) ────────────────────────────────
-echo [INFO]  Checking port 8080...
-for /f "tokens=5" %%p in ('netstat -ano 2^>nul ^| findstr ":8080 " ^| findstr "LISTENING"') do (
+REM ── 1. Kill by port 8081 (Spring Boot backend) ────────────────────────────────
+echo [INFO]  Checking port 8081...
+for /f "tokens=5" %%p in ('netstat -ano 2^>nul ^| findstr ":8081 " ^| findstr "LISTENING"') do (
     if "%%p" neq "" (
         if "%%p" neq "0" (
-            echo [INFO]  Killing PID %%p on port 8080...
+            echo [INFO]  Killing PID %%p on port 8081...
             taskkill /PID %%p /F >nul 2>&1
             if !errorlevel! equ 0 (
-                echo [OK]    Stopped process on port 8080 ^(PID %%p^)
+                echo [OK]    Stopped process on port 8081 ^(PID %%p^)
                 set /a killed+=1
             ) else (
                 echo [WARN]  Could not stop PID %%p - may already be stopped
@@ -41,10 +41,10 @@ if %errorlevel% equ 0 (
     )
 )
 
-REM Fallback: kill all java.exe if still on port 8080
-netstat -ano 2>nul | findstr ":8080 " | findstr "LISTENING" >nul 2>&1
+REM Fallback: kill all java.exe if still on port 8081
+netstat -ano 2>nul | findstr ":8081 " | findstr "LISTENING" >nul 2>&1
 if %errorlevel% equ 0 (
-    echo [INFO]  Port 8080 still in use - attempting taskkill on java.exe...
+    echo [INFO]  Port 8081 still in use - attempting taskkill on java.exe...
     taskkill /IM java.exe /F >nul 2>&1
     if !errorlevel! equ 0 (
         echo [OK]    Stopped java.exe

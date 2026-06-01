@@ -266,9 +266,9 @@ Unique `runId` timestamp prevents Spring Batch from rejecting re-runs as duplica
 
 ```bash
 # Generate + convert in two calls
-curl -X POST http://localhost:8080/api/random-statements | jq .firstStatementId
+curl -X POST http://localhost:8081/api/random-statements | jq .firstStatementId
 
-curl -X POST http://localhost:8080/api/conversions \
+curl -X POST http://localhost:8081/api/conversions \
   -H "Content-Type: application/json" \
   -d '{"statementId":1,"targetFormat":"MT940","engine":"PROWIDE"}' | jq .
 ```
@@ -293,7 +293,7 @@ Three files in `src/main/resources/static/`:
 
 **6 views:** Dashboard · Generate · Conversion Runner · History · Benchmarks · Diagrams
 
-Served directly by Spring Boot — open `http://localhost:8080`
+Served directly by Spring Boot — open `http://localhost:8081`
 
 ---
 
@@ -312,17 +312,17 @@ mvn spring-boot:run
 # OR: ./run.sh  |  .\run.ps1  |  run.bat
 
 # 3. Open the browser
-open http://localhost:8080
+open http://localhost:8081
 ```
 
 **All endpoints up immediately:**
 
 | URL | What you get |
 |-----|-------------|
-| `http://localhost:8080` | Web UI |
-| `http://localhost:8080/swagger-ui.html` | API docs |
-| `http://localhost:8080/h2-console` | Database console |
-| `http://localhost:8080/actuator/health` | Health check |
+| `http://localhost:8081` | Web UI |
+| `http://localhost:8081/swagger-ui.html` | API docs |
+| `http://localhost:8081/h2-console` | Database console |
+| `http://localhost:8081/actuator/health` | Health check |
 
 ---
 

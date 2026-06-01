@@ -1,4 +1,4 @@
-# run.ps1 - Build and start the Banking Statement Converter backend (port 8080)
+# run.ps1 - Build and start the Banking Statement Converter backend (port 8081)
 # Platforms: macOS, Ubuntu/Debian Linux, Windows 10+  (requires PowerShell Core 7+ on Mac/Linux)
 # Usage:
 #   .\run.ps1              - build and start (Swagger at /swagger-ui.html, H2 at /h2-console)
@@ -22,7 +22,7 @@ $BackendLog  = Join-Path $LogDir "backend.log"
 $BackendErr  = Join-Path $LogDir "backend-err.log"
 $BuildLog    = Join-Path $LogDir "build.log"
 $PidFile     = Join-Path $LogDir "backend.pid"
-$BackendPort = 8080
+$BackendPort = 8081
 $HealthUrl   = "http://localhost:$BackendPort/actuator/health"
 
 # -- helpers -------------------------------------------------------------------
@@ -124,11 +124,11 @@ Wait-ForBackend
 Write-Host ""
 Write-Host "+--------------------------------------------------------------+" -ForegroundColor Green
 Write-Host "|  Backend is running                                          |" -ForegroundColor Green
-Write-Host "|  UI        ->  http://localhost:8080/                        |" -ForegroundColor Green
-Write-Host "|  API       ->  http://localhost:8080/api                     |" -ForegroundColor Green
-Write-Host "|  Swagger   ->  http://localhost:8080/swagger-ui.html         |" -ForegroundColor Green
-Write-Host "|  H2 DB     ->  http://localhost:8080/h2-console              |" -ForegroundColor Green
-Write-Host "|  Health    ->  http://localhost:8080/actuator/health         |" -ForegroundColor Green
+Write-Host "|  UI        ->  http://localhost:8081/                        |" -ForegroundColor Green
+Write-Host "|  API       ->  http://localhost:8081/api                     |" -ForegroundColor Green
+Write-Host "|  Swagger   ->  http://localhost:8081/swagger-ui.html         |" -ForegroundColor Green
+Write-Host "|  H2 DB     ->  http://localhost:8081/h2-console              |" -ForegroundColor Green
+Write-Host "|  Health    ->  http://localhost:8081/actuator/health         |" -ForegroundColor Green
 Write-Host "|                                                              |" -ForegroundColor Green
 Write-Host "|  Stop:  .\kill.ps1                                           |" -ForegroundColor Green
 Write-Host "+--------------------------------------------------------------+" -ForegroundColor Green
