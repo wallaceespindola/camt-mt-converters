@@ -45,7 +45,7 @@
         <velocity.version>2.4.1</velocity.version>
         <velocity-tools.version>3.1</velocity-tools.version>
         <mapstruct.version>1.6.3</mapstruct.version>
-        <jacoco.version>0.8.14</jacoco.version>
+        <jacoco.version>0.8.15</jacoco.version>
     </properties>
 
     <dependencies>
