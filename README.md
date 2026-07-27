@@ -311,7 +311,7 @@ CDN dependencies loaded at runtime (no local install):
 | **Generate Statements** | `#generate` | Seed H2 with LOW, MEDIUM, or HIGH load profile; shows generated statement ID |
 | **Conversion Runner** | `#convert` | Select statement ID + format + engine; single run or all 8 combinations |
 | **History** | `#history` | Auto-refreshing table of all conversion job executions (every 15 s) |
-| **Charts** | `#charts` | Duration by format/engine, timeline, status breakdown (every 30 s) |
+| **Benchmarks** | `#benchmarks` | Duration by format/engine, timeline, status breakdown (every 30 s) |
 | **Diagrams** | `#diagrams` | Live-rendered Mermaid architecture diagrams |
 
 ---
