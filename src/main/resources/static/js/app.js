@@ -258,6 +258,7 @@ function convert() {
         <button class="btn full" id="btn-run" onclick="doConvert()" style="margin-top:12px">▶ Run Conversion</button>
         <hr>
         <button class="btn outline full" id="btn-all" onclick="doRunAll()">▶▶ Run All 8 Combinations</button>
+        <button class="btn outline full" id="btn-sel" onclick="doRunSelected()" style="margin-top:8px">☑ Run Selected Combinations</button>
         <p class="muted sm" style="margin-top:6px;text-align:center">4 formats × 2 engines sequentially</p>
       </div>
 
@@ -279,8 +280,8 @@ async function doConvert() {
     $('conv-result').innerHTML = `<p class="red">Enter a valid Statement ID.</p>`;
     return;
   }
-  const btnR = $('btn-run'), btnA = $('btn-all');
-  btnR.disabled = btnA.disabled = true;
+  const btnR = $('btn-run'), btnA = $('btn-all'), btnS = $('btn-sel');
+  btnR.disabled = btnA.disabled = btnS.disabled = true;
   btnR.textContent = 'Running…';
 
   try {
@@ -305,22 +306,23 @@ async function doConvert() {
   } catch (e) {
     $('conv-result').innerHTML = `<p class="red">Failed: ${esc(e.message)}</p>`;
   } finally {
-    btnR.disabled = btnA.disabled = false;
+    btnR.disabled = btnA.disabled = btnS.disabled = false;
     btnR.textContent = '▶ Run Conversion';
   }
 }
 
-async function doRunAll() {
+async function doRunAll(combos) {
   const id = $('stmt-id')?.value?.trim();
   if (!id || isNaN(+id)) {
     $('conv-result').innerHTML = `<p class="red">Enter a valid Statement ID.</p>`;
     return;
   }
-  const btnR = $('btn-run'), btnA = $('btn-all');
-  btnA.disabled = btnR.disabled = true;
+  const btnR = $('btn-run'), btnA = $('btn-all'), btnS = $('btn-sel');
+  btnA.disabled = btnR.disabled = btnS.disabled = true;
   btnA.textContent = 'Running…';
 
-  const rows = FORMATS.flatMap(f => ENGINES.map(e => ({ f, e, st:'PENDING', ms:null, jobId:null, file:null })));
+  const picked = combos || FORMATS.flatMap(f => ENGINES.map(e => ({ f, e })));
+  const rows = picked.map(c => ({ ...c, st:'PENDING', ms:null, jobId:null, file:null }));
 
   function paint() {
     const done = rows.filter(r => r.st !== 'PENDING' && r.st !== 'RUNNING').length;
@@ -328,19 +330,20 @@ async function doRunAll() {
     $('conv-result').innerHTML = `
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <b>All 8 Combinations</b><span class="muted">${done} / ${rows.length}</span>
+          <b>${rows.length === 8 ? 'All 8' : rows.length} Combination${rows.length !== 1 ? 's' : ''}</b><span class="muted">${done} / ${rows.length}</span>
         </div>
         <div class="progress"><div class="bar" style="width:${Math.round(done/rows.length*100)}%"></div></div>
         <table>
-          <thead><tr><th>Format</th><th>Engine</th><th>Status</th><th>ms</th><th>Job ID</th><th>Output</th></tr></thead>
+          <thead><tr><th>Format</th><th>Engine</th><th>Status</th><th>ms</th><th>Job ID</th><th>Output</th><th>File</th></tr></thead>
           <tbody>${rows.map(r => `<tr>
             <td><b>${esc(r.f)}</b></td>
             <td>${esc(r.e)}</td>
             <td>${chip(r.st)}</td>
             <td>${r.ms !== null ? r.ms : r.st === 'RUNNING' ? '<span class="spin-sm"></span>' : '—'}</td>
             <td>${r.jobId !== null ? '#' + r.jobId : '—'}</td>
-            <td class="muted sm">${r.file
-              ? `${esc(r.file)} <button class="btn sm" onclick="viewFile(${Number(r.jobId)}, '${esc(r.file)}')">View</button>`
+            <td class="muted sm">${r.file ? esc(r.file) : '—'}</td>
+            <td>${r.file
+              ? `<button class="btn sm" onclick="viewFile(${Number(r.jobId)}, '${esc(r.file)}')">👁 View</button>`
               : '—'}</td>
           </tr>`).join('')}</tbody>
         </table>
@@ -360,8 +363,71 @@ async function doRunAll() {
     }
     paint();
   }
-  btnA.disabled = btnR.disabled = false;
+  btnA.disabled = btnR.disabled = btnS.disabled = false;
   btnA.textContent = '▶▶ Run All 8 Combinations';
+}
+
+function doRunSelected() {
+  const id = $('stmt-id')?.value?.trim();
+  if (!id || isNaN(+id)) {
+    $('conv-result').innerHTML = `<p class="red">Enter a valid Statement ID.</p>`;
+    return;
+  }
+  closeModal();
+  const overlay = document.createElement('div');
+  overlay.id = 'modal-overlay';
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.style.width = 'min(440px, 100%)';
+
+  const head = document.createElement('div');
+  head.className = 'modal-head';
+  const titleEl = document.createElement('b');
+  titleEl.textContent = '☑ Select Combinations';
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'modal-close';
+  closeBtn.textContent = '✕';
+  closeBtn.onclick = closeModal;
+  head.append(titleEl, closeBtn);
+
+  const body = document.createElement('div');
+  body.className = 'combo-grid';
+  const boxes = [];
+  FORMATS.forEach(f => ENGINES.forEach(e => {
+    const label = document.createElement('label');
+    label.className = 'combo-opt';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = true;
+    boxes.push({ cb, f, e });
+    label.append(cb, document.createTextNode(` ${f} · ${e}`));
+    body.appendChild(label);
+  }));
+
+  const foot = document.createElement('div');
+  foot.className = 'modal-foot';
+  const toggleBtn = document.createElement('button');
+  toggleBtn.className = 'btn sm outline';
+  toggleBtn.textContent = 'Toggle All';
+  toggleBtn.onclick = () => {
+    const anyOn = boxes.some(b => b.cb.checked);
+    boxes.forEach(b => { b.cb.checked = !anyOn; });
+  };
+  const runBtn = document.createElement('button');
+  runBtn.className = 'btn sm';
+  runBtn.textContent = '▶ Run Selected';
+  runBtn.onclick = () => {
+    const combos = boxes.filter(b => b.cb.checked).map(b => ({ f: b.f, e: b.e }));
+    if (!combos.length) return;
+    closeModal();
+    doRunAll(combos);
+  };
+  foot.append(toggleBtn, runBtn);
+
+  modal.append(head, body, foot);
+  overlay.appendChild(modal);
+  overlay.onclick = ev => { if (ev.target === overlay) closeModal(); };
+  document.body.appendChild(overlay);
 }
 
 // ── History ───────────────────────────────────────────────────────────────────
