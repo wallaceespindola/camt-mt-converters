@@ -607,11 +607,12 @@ function formats() {
     <b>Libraries &amp; Links</b>
     <div class="card" style="margin:10px 0 20px;overflow-x:auto">
       <table>
-        <thead><tr><th>Library</th><th>Version</th><th>Engine</th><th>Maven Central</th><th>Source / Docs</th></tr></thead>
+        <thead><tr><th>Library</th><th>Version</th><th>Released</th><th>Engine</th><th>Maven Central</th><th>Source / Docs</th></tr></thead>
         <tbody>
           <tr>
             <td><code>com.prowidesoftware:pw-swift-core</code></td>
             <td>SRU2024-10.2.13</td>
+            <td class="muted sm">2025-09-03</td>
             <td>${engChip('PROWIDE')}</td>
             <td><a href="https://central.sonatype.com/artifact/com.prowidesoftware/pw-swift-core" target="_blank" rel="noopener">central.sonatype.com</a></td>
             <td><a href="https://github.com/prowide/prowide-core" target="_blank" rel="noopener">github.com/prowide/prowide-core</a></td>
@@ -619,6 +620,7 @@ function formats() {
           <tr>
             <td><code>com.prowidesoftware:pw-iso20022</code></td>
             <td>SRU2025-10.3.10</td>
+            <td class="muted sm">2026-07-16</td>
             <td>${engChip('PROWIDE')}</td>
             <td><a href="https://central.sonatype.com/artifact/com.prowidesoftware/pw-iso20022" target="_blank" rel="noopener">central.sonatype.com</a></td>
             <td><a href="https://github.com/prowide/prowide-iso20022" target="_blank" rel="noopener">github.com/prowide/prowide-iso20022</a></td>
@@ -626,6 +628,7 @@ function formats() {
           <tr>
             <td><code>org.apache.velocity:velocity-engine-core</code></td>
             <td>2.4.1</td>
+            <td class="muted sm">2024-10-14</td>
             <td>${engChip('VELOCITY')}</td>
             <td><a href="https://central.sonatype.com/artifact/org.apache.velocity/velocity-engine-core" target="_blank" rel="noopener">central.sonatype.com</a></td>
             <td><a href="https://velocity.apache.org" target="_blank" rel="noopener">velocity.apache.org</a></td>
@@ -633,6 +636,7 @@ function formats() {
           <tr>
             <td><code>org.apache.velocity.tools:velocity-tools-generic</code></td>
             <td>3.1</td>
+            <td class="muted sm">2021-02-27</td>
             <td>${engChip('VELOCITY')}</td>
             <td><a href="https://central.sonatype.com/artifact/org.apache.velocity.tools/velocity-tools-generic" target="_blank" rel="noopener">central.sonatype.com</a></td>
             <td><a href="https://github.com/apache/velocity-tools" target="_blank" rel="noopener">github.com/apache/velocity-tools</a></td>
