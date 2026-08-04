@@ -343,7 +343,7 @@ async function doRunAll(combos) {
             <td>${r.jobId !== null ? '#' + r.jobId : '—'}</td>
             <td class="muted sm">${r.file ? esc(r.file) : '—'}</td>
             <td>${r.file
-              ? `<button class="btn sm" onclick="viewFile(${Number(r.jobId)}, '${esc(r.file)}')">👁 View</button>`
+              ? `<button class="btn sm" onclick="viewFile(${Number(r.jobId)}, '${esc(r.file)}')">View</button>`
               : '—'}</td>
           </tr>`).join('')}</tbody>
         </table>
