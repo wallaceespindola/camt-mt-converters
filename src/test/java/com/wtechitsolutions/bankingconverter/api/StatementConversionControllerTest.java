@@ -6,6 +6,8 @@ import com.wtechitsolutions.bankingconverter.batch.BatchJobService;
 import com.wtechitsolutions.bankingconverter.conversion.ConversionEngine;
 import com.wtechitsolutions.bankingconverter.conversion.ConversionTargetFormat;
 import org.junit.jupiter.api.Test;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -18,6 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -66,6 +69,26 @@ class StatementConversionControllerTest {
         when(batchJobService.getJobExecution(999L)).thenReturn(null);
 
         mockMvc.perform(get("/api/conversions/jobs/999"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void get_job_file_returns_content_from_execution_context() throws Exception {
+        JobExecution execution = new JobExecution(7L);
+        StepExecution step = execution.createStepExecution("exportStep");
+        step.getExecutionContext().putString("fileContent", ":20:REF123");
+        when(batchJobService.getJobExecution(7L)).thenReturn(execution);
+
+        mockMvc.perform(get("/api/conversions/jobs/7/file"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(":20:REF123"));
+    }
+
+    @Test
+    void get_job_file_returns_404_when_no_content() throws Exception {
+        when(batchJobService.getJobExecution(8L)).thenReturn(new JobExecution(8L));
+
+        mockMvc.perform(get("/api/conversions/jobs/8/file"))
                 .andExpect(status().isNotFound());
     }
 }

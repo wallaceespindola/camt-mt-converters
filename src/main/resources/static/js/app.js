@@ -37,6 +37,8 @@ const api = {
   jobs:     ()  => fetch('/api/conversions/jobs').then(r => r.json()).catch(() => []),
   generate: (p) => post(`/api/random-statements?loadProfile=${p}`),
   convert:  (b) => post('/api/conversions', b),
+  deleteAll:()  => fetch('/api/data', { method:'DELETE' }).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+  jobFile:  (id)=> fetch(`/api/conversions/jobs/${id}/file`).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); }),
 };
 
 async function post(url, body) {
@@ -154,11 +156,51 @@ function generate() {
         <button class="btn full" id="btn-high" onclick="doGenerate('HIGH')" style="margin-top:12px">🔥 Generate High</button>
       </div>
     </div>
+    <div class="card" style="border-color:var(--red);margin-bottom:16px">
+      <b class="red">🗑 Danger Zone</b><hr>
+      <p>Delete all generated statements, all conversion history and all files in the output folder, to start fresh.</p>
+      <button class="btn danger" id="btn-delete-all" onclick="doDeleteAll()" style="margin-top:12px">🗑 Delete All Data</button>
+    </div>
     <div id="gen-result"></div>
   `);
 }
 
 const PROFILE_LABELS = { LOW: '▶ Generate Low', MEDIUM: '🚀 Generate Medium', HIGH: '🔥 Generate High' };
+
+async function doDeleteAll() {
+  if (!confirm('Delete ALL generated statements, conversion history and output files? This cannot be undone.')) return;
+  const btn = $('btn-delete-all');
+  btn.disabled = true;
+  btn.textContent = 'Deleting…';
+  try {
+    const r = await api.deleteAll();
+    localStorage.removeItem('lastStatementId');
+    $('gen-result').innerHTML = `
+      <div class="card success-border">
+        <b class="green">✓ All data deleted — ready for a fresh start</b><hr>
+        <div class="g4" style="margin:12px 0">
+          <div class="card" style="text-align:center">
+            <div class="big">${esc(r.statementsDeleted)}</div><div class="muted sm">Statements</div>
+          </div>
+          <div class="card" style="text-align:center">
+            <div class="big">${esc(r.transactionsDeleted)}</div><div class="muted sm">Transactions</div>
+          </div>
+          <div class="card" style="text-align:center">
+            <div class="big">${esc(r.jobsDeleted)}</div><div class="muted sm">Jobs</div>
+          </div>
+          <div class="card" style="text-align:center">
+            <div class="big">${esc(r.filesDeleted)}</div><div class="muted sm">Output Files</div>
+          </div>
+        </div>
+        <p class="muted sm">${esc(dt(r.timestamp))}</p>
+      </div>`;
+  } catch (e) {
+    $('gen-result').innerHTML = `<p class="red" style="margin-top:12px">Error: ${esc(e.message)}</p>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🗑 Delete All Data';
+  }
+}
 
 async function doGenerate(profile) {
   const allBtns = ['low', 'medium', 'high'].map(p => $('btn-' + p)).filter(Boolean);
@@ -254,6 +296,9 @@ async function doConvert() {
           <div><div class="muted sm">Engine</div><b>${esc(r.engine)}</b></div>
           <div><div class="muted sm">Output File</div><code>${esc(r.outputFile || '—')}</code></div>
         </div>
+        ${r.status === 'COMPLETED' && r.outputFile
+          ? `<button class="btn sm" style="margin-bottom:12px" onclick="viewFile(${Number(r.jobId)}, '${esc(r.outputFile)}')">View Output File</button>`
+          : ''}
         ${r.fileContent ? `<p class="muted sm" style="margin-bottom:6px">Preview (6 000 chars):</p>
           <pre>${esc(r.fileContent.slice(0, 6000))}${r.fileContent.length > 6000 ? '\n…' : ''}</pre>` : ''}
       </div>`;
@@ -294,7 +339,9 @@ async function doRunAll() {
             <td>${chip(r.st)}</td>
             <td>${r.ms !== null ? r.ms : r.st === 'RUNNING' ? '<span class="spin-sm"></span>' : '—'}</td>
             <td>${r.jobId !== null ? '#' + r.jobId : '—'}</td>
-            <td class="muted sm">${esc(r.file || '—')}</td>
+            <td class="muted sm">${r.file
+              ? `${esc(r.file)} <button class="btn sm" onclick="viewFile(${Number(r.jobId)}, '${esc(r.file)}')">View</button>`
+              : '—'}</td>
           </tr>`).join('')}</tbody>
         </table>
         ${all ? `<p class="green" style="margin-top:10px">✓ All ${rows.length} combinations completed.</p>` : ''}
@@ -351,7 +398,7 @@ async function paintHistory() {
         <span>${chip('COMPLETED')} ${ok} &nbsp; ${chip('FAILED')} ${fail}</span>
       </div>
       <table>
-        <thead><tr><th>#</th><th>Format</th><th>Engine</th><th>Status</th><th>ms</th><th>Output</th><th>Started</th></tr></thead>
+        <thead><tr><th>#</th><th>Format</th><th>Engine</th><th>Status</th><th>ms</th><th>Output</th><th>Started</th><th>File</th></tr></thead>
         <tbody>${sorted.map(j => `<tr>
           <td><b>${esc(j.jobId)}</b></td>
           <td><span class="chip" style="background:${FMT_COLOR[j.targetFormat]||'#999'};color:#fff">${esc(j.targetFormat)}</span></td>
@@ -360,9 +407,53 @@ async function paintHistory() {
           <td>${j.durationMs > 0 ? j.durationMs : '—'}</td>
           <td class="muted sm">${esc(j.outputFile || '—')}</td>
           <td class="muted sm">${esc(dt(j.startTime))}</td>
+          <td>${j.status === 'COMPLETED' && j.outputFile
+            ? `<button class="btn sm" onclick="viewFile(${Number(j.jobId)}, '${esc(j.outputFile)}')">View</button>`
+            : '—'}</td>
         </tr>`).join('')}</tbody>
       </table>
     </div>`;
+}
+
+// ── File viewer modal ─────────────────────────────────────────────────────────
+async function viewFile(jobId, fileName) {
+  openModal(`📄 Job #${jobId} — ${fileName}`, 'Loading…');
+  try {
+    const content = await api.jobFile(jobId);
+    const body = document.querySelector('#modal-overlay .modal-body');
+    if (body) body.textContent = content;
+  } catch (e) {
+    const body = document.querySelector('#modal-overlay .modal-body');
+    if (body) body.textContent = `Error loading file: ${e.message}`;
+  }
+}
+
+function openModal(title, bodyText) {
+  closeModal();
+  const overlay = document.createElement('div');
+  overlay.id = 'modal-overlay';
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  const head = document.createElement('div');
+  head.className = 'modal-head';
+  const titleEl = document.createElement('b');
+  titleEl.textContent = title;
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'modal-close';
+  closeBtn.textContent = '✕';
+  closeBtn.onclick = closeModal;
+  head.append(titleEl, closeBtn);
+  const body = document.createElement('pre');
+  body.className = 'modal-body';
+  body.textContent = bodyText;
+  modal.append(head, body);
+  overlay.appendChild(modal);
+  overlay.onclick = e => { if (e.target === overlay) closeModal(); };
+  document.body.appendChild(overlay);
+}
+
+function closeModal() {
+  $('modal-overlay')?.remove();
 }
 
 // ── Benchmarks ────────────────────────────────────────────────────────────────
