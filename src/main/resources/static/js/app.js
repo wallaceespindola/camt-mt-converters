@@ -8,7 +8,7 @@ const ENGINES = ['PROWIDE', 'VELOCITY'];
 const FMT_COLOR = { MT940:'#E64A19', MT942:'#FF9800', CAMT052:'#FFC107', CAMT053:'#FF7043' };
 const ENG_COLOR = { PROWIDE:'#E64A19', VELOCITY:'#7B1FA2' };
 const STA_COLOR = { COMPLETED:'#4CAF50', FAILED:'#F44336', STARTED:'#FF9800', STARTING:'#FF9800' };
-const VIEWS     = ['dashboard', 'generate', 'convert', 'history', 'benchmarks', 'diagrams'];
+const VIEWS     = ['dashboard', 'generate', 'convert', 'history', 'benchmarks', 'formats', 'diagrams'];
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let theme      = localStorage.getItem('theme') || 'light';
@@ -65,7 +65,7 @@ function go(view) {
   window.location.hash = view;
   document.querySelectorAll('nav a').forEach(a => a.classList.toggle('active', a.dataset.view === view));
   show('<div class="spinner-wrap"><div class="spinner"></div></div>');
-  setTimeout(() => ({ dashboard, generate, convert, history, benchmarks: viewCharts, diagrams }[view])(), 0);
+  setTimeout(() => ({ dashboard, generate, convert, history, benchmarks: viewCharts, formats, diagrams }[view])(), 0);
 }
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
@@ -520,6 +520,138 @@ function openModal(title, bodyText) {
 
 function closeModal() {
   $('modal-overlay')?.remove();
+}
+
+// ── Formats & Engines ─────────────────────────────────────────────────────────
+function formats() {
+  const fmtChip = f => `<span class="chip" style="background:${FMT_COLOR[f]||'#999'};color:#fff">${f}</span>`;
+  const engChip = e => `<span class="chip" style="background:${ENG_COLOR[e]||'#999'};color:#fff">${e}</span>`;
+  show(`
+    <h2>ℹ️ Formats &amp; Engines</h2>
+    <p class="muted" style="margin-bottom:16px">
+      What each option analyzed in the Benchmarks view actually is: the 4 target formats,
+      the 2 conversion engines, and how the 8 combinations are measured.
+    </p>
+
+    <b>Target Formats</b>
+    <div class="g2" style="margin:10px 0 20px">
+      <div class="card">
+        ${fmtChip('MT940')} <b style="margin-left:6px">Customer Statement Message</b><hr>
+        <p>SWIFT FIN end-of-day account statement. Plain-text tag/value syntax
+        (<code>:20:</code> reference, <code>:25:</code> account, <code>:60F:</code>/<code>:62F:</code>
+        opening/closing balance, <code>:61:</code> transaction line, <code>:86:</code> remittance info).</p>
+        <p class="muted sm" style="margin-top:8px">Used for daily statement delivery and end-of-day reconciliation.
+        Legacy but still dominant in corporate banking. Output: <code>statement-{id}.mt940</code> (text/plain).</p>
+      </div>
+      <div class="card">
+        ${fmtChip('MT942')} <b style="margin-left:6px">Interim Transaction Report</b><hr>
+        <p>SWIFT FIN intraday statement. Same tag syntax as MT940 but reports transactions
+        since the last statement or report, with floor-limit indication (<code>:34F:</code>)
+        and date/time indication (<code>:13D:</code>) instead of full balance bookends.</p>
+        <p class="muted sm" style="margin-top:8px">Used for intraday cash visibility and liquidity monitoring.
+        Output: <code>statement-{id}.mt942</code> (text/plain).</p>
+      </div>
+      <div class="card">
+        ${fmtChip('CAMT052')} <b style="margin-left:6px">Bank-to-Customer Account Report</b><hr>
+        <p>ISO 20022 XML — the modern equivalent of MT942. Intraday account report
+        (<code>BkToCstmrAcctRpt</code>): nested XML with typed balances, structured entries and
+        ISO transaction codes instead of free-text tags.</p>
+        <p class="muted sm" style="margin-top:8px">Part of the SWIFT MT→MX migration and SEPA reporting.
+        Output: <code>statement-{id}.camt052.xml</code> (application/xml).</p>
+      </div>
+      <div class="card">
+        ${fmtChip('CAMT053')} <b style="margin-left:6px">Bank-to-Customer Statement</b><hr>
+        <p>ISO 20022 XML — the modern equivalent of MT940. End-of-day statement
+        (<code>BkToCstmrStmt</code>) with full opening/closing balance set, structured remittance
+        information and richer party/account identification.</p>
+        <p class="muted sm" style="margin-top:8px">The target format for banks migrating off MT940.
+        Output: <code>statement-{id}.camt053.xml</code> (application/xml).</p>
+      </div>
+    </div>
+
+    <b>Conversion Engines</b>
+    <div class="g2" style="margin:10px 0 20px">
+      <div class="card">
+        ${engChip('PROWIDE')} <b style="margin-left:6px">Prowide Core / ISO 20022</b><hr>
+        <p>Programmatic model-based generation. MT files are built with the Prowide Core SWIFT
+        object model (<code>MT940</code>, <code>Field61</code>, …); camt files with the Prowide
+        ISO 20022 typed message classes. The library owns syntax rules, field formats and
+        message structure.</p>
+        <p class="muted sm" style="margin-top:8px"><b>Trade-off:</b> type-safe, standards-validated, refactor-friendly —
+        at the cost of a heavier dependency and one-time classloading of the SWIFT model
+        (warmed up at startup). Steady-state it is the fastest engine here, especially for camt.</p>
+      </div>
+      <div class="card">
+        ${engChip('VELOCITY')} <b style="margin-left:6px">Apache Velocity Templates</b><hr>
+        <p>Template-based text generation. Each format has a <code>.vm</code> template with
+        placeholders; the engine merges the domain <code>BankStatement</code> into it. The
+        template owns the message layout — the code only supplies data.</p>
+        <p class="muted sm" style="margin-top:8px"><b>Trade-off:</b> layout changes need no recompile and templates are
+        readable by non-developers — but no schema validation (output is only as correct as the
+        template) and every run pays the template merge, so it trails Prowide at steady state.</p>
+      </div>
+    </div>
+
+    <b>How the Benchmarks measure</b>
+    <div class="card" style="margin:10px 0 20px">
+      <p>Every conversion runs as a Spring Batch job: <i>read</i> the statement from H2 →
+      <i>process</i> it through the selected (format, engine) strategy → <i>write</i> the file to
+      <code>./output/</code>. The <b>ms</b> value is the job's server-side start→end duration, so it
+      includes persistence and file I/O, not just formatting.</p>
+      <p class="muted sm" style="margin-top:8px">All 8 strategies are warmed up at application startup
+      (classloading, template parsing, first Hibernate query), so no combination is penalized for
+      running first. Averages in the Benchmarks view are per format and per engine across all
+      recorded jobs — use Generate → Run All 8 Combinations a few times for stable numbers.</p>
+    </div>
+
+    <b>Libraries &amp; Links</b>
+    <div class="card" style="margin:10px 0 20px;overflow-x:auto">
+      <table>
+        <thead><tr><th>Library</th><th>Version</th><th>Engine</th><th>Maven Central</th><th>Source / Docs</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>com.prowidesoftware:pw-swift-core</code></td>
+            <td>SRU2024-10.2.13</td>
+            <td>${engChip('PROWIDE')}</td>
+            <td><a href="https://central.sonatype.com/artifact/com.prowidesoftware/pw-swift-core" target="_blank" rel="noopener">central.sonatype.com</a></td>
+            <td><a href="https://github.com/prowide/prowide-core" target="_blank" rel="noopener">github.com/prowide/prowide-core</a></td>
+          </tr>
+          <tr>
+            <td><code>com.prowidesoftware:pw-iso20022</code></td>
+            <td>SRU2025-10.3.10</td>
+            <td>${engChip('PROWIDE')}</td>
+            <td><a href="https://central.sonatype.com/artifact/com.prowidesoftware/pw-iso20022" target="_blank" rel="noopener">central.sonatype.com</a></td>
+            <td><a href="https://github.com/prowide/prowide-iso20022" target="_blank" rel="noopener">github.com/prowide/prowide-iso20022</a></td>
+          </tr>
+          <tr>
+            <td><code>org.apache.velocity:velocity-engine-core</code></td>
+            <td>2.4.1</td>
+            <td>${engChip('VELOCITY')}</td>
+            <td><a href="https://central.sonatype.com/artifact/org.apache.velocity/velocity-engine-core" target="_blank" rel="noopener">central.sonatype.com</a></td>
+            <td><a href="https://velocity.apache.org" target="_blank" rel="noopener">velocity.apache.org</a></td>
+          </tr>
+          <tr>
+            <td><code>org.apache.velocity.tools:velocity-tools-generic</code></td>
+            <td>3.1</td>
+            <td>${engChip('VELOCITY')}</td>
+            <td><a href="https://central.sonatype.com/artifact/org.apache.velocity.tools/velocity-tools-generic" target="_blank" rel="noopener">central.sonatype.com</a></td>
+            <td><a href="https://github.com/apache/velocity-tools" target="_blank" rel="noopener">github.com/apache/velocity-tools</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="muted sm" style="margin-top:10px">
+        Standards references:
+        <a href="https://www.swift.com/standards" target="_blank" rel="noopener">SWIFT MT standards</a> ·
+        <a href="https://www.iso20022.org/iso-20022-message-definitions" target="_blank" rel="noopener">ISO 20022 message definitions (camt)</a> ·
+        Project source: <a href="https://github.com/wallaceespindola/camt-mt-converters" target="_blank" rel="noopener">github.com/wallaceespindola/camt-mt-converters</a>
+      </p>
+      <p class="muted sm" style="margin-top:4px">Page last updated: 2026-08-04</p>
+    </div>
+
+    <button class="btn" onclick="go('benchmarks')">📊 Go to Benchmarks</button>
+    &nbsp;
+    <button class="btn outline" onclick="go('convert')">▶ Run Conversions</button>
+  `);
 }
 
 // ── Benchmarks ────────────────────────────────────────────────────────────────
