@@ -606,3 +606,9 @@ camt-mt-converters/
 - Email: [wallace.espindola@gmail.com](mailto:wallace.espindola@gmail.com)
 - LinkedIn: [linkedin.com/in/wallaceespindola](https://www.linkedin.com/in/wallaceespindola/)
 - GitHub: [github.com/wallaceespindola](https://github.com/wallaceespindola/)
+
+## License
+
+- This project is released under the Apache 2.0 License.
+- See the [LICENSE](LICENSE) file for details.
+- Copyright © 2026 [Wallace Espindola](https://github.com/wallaceespindola/).
