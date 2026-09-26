@@ -21,6 +21,31 @@ Enterprise-grade banking statement converter platform. Converts internal domain 
 
 ---
 
+## Table of Contents
+
+- [Overview](#overview)
+- [SWIFT MT and ISO 20022 in European Banking](#swift-mt-and-iso-20022-in-european-banking)
+- [Architecture](#architecture)
+- [Supported Banking Formats](#supported-banking-formats)
+- [Conversion Engine Comparison](#conversion-engine-comparison)
+- [Quick Start](#quick-start)
+- [Frontend](#frontend)
+- [REST API](#rest-api)
+- [Makefile Commands](#makefile-commands)
+- [Strategy Pattern](#strategy-pattern-1)
+- [Architecture Diagrams](#architecture-diagrams)
+- [Swagger UI](#swagger-ui)
+- [Spring Actuator](#spring-actuator)
+- [Validation Chain](#validation-chain)
+- [Output Files](#output-files)
+- [Testing Strategy](#testing-strategy)
+- [Repository Structure](#repository-structure)
+- [External Standards & Libraries](#external-standards--libraries)
+- [Author](#author)
+- [License](#license)
+
+---
+
 ## Overview
 
 This platform is a production-ready reference implementation for banking format conversion. Engineers can generate realistic bank statement datasets and trigger Spring Batch export jobs that produce standards-compliant SWIFT MT and ISO 20022 camt files via either the Prowide library suite or Apache Velocity templates.
